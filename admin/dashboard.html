@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Tekpair</title>
+
+  <link rel="icon" type="image/png" href="../assets/Tekpair.png">
+  <meta name="description" content="Tekpair admin dashboard — platform overview, stats, and recent activity.">
+  <meta name="robots" content="noindex">
+  <meta property="og:title" content="Admin Dashboard — Tekpair">
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Layout ─────────────────────────────────────────── */
+    .page-header {
+      padding-top: var(--spacing-8);
+      margin-bottom: var(--spacing-6);
+    }
+    .page-header h1 {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin: 0 0 var(--spacing-1);
+    }
+    .page-header p {
+      color: var(--color-text-secondary);
+      margin: 0;
+      font-size: var(--font-size-sm);
+    }
+
+    /* ── Stats row ──────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-8);
+    }
+    @media (max-width: 860px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 460px) { .stats-row { grid-template-columns: 1fr; } }
+
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-1);
+    }
+    .stat-card-icon {
+      font-size: 1.5rem;
+      margin-bottom: var(--spacing-2);
+    }
+    .stat-card-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .stat-card-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      line-height: 1;
+    }
+    .stat-card.accent-blue  { border-top: 3px solid var(--color-primary); }
+    .stat-card.accent-green { border-top: 3px solid var(--color-success); }
+    .stat-card.accent-warn  { border-top: 3px solid var(--color-warning); }
+    .stat-card.accent-red   { border-top: 3px solid var(--color-danger);  }
+    .stat-skeleton { background: var(--color-border); border-radius: var(--radius-md); height: 2.5rem; width: 60%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+
+    /* ── Quick actions ──────────────────────────────────── */
+    .section-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      margin: 0 0 var(--spacing-4);
+    }
+    .quick-tiles {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-8);
+    }
+    @media (max-width: 860px) { .quick-tiles { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 460px) { .quick-tiles { grid-template-columns: 1fr; } }
+
+    .quick-tile {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-6);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-2);
+      text-decoration: none;
+      color: var(--color-text);
+      transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+      cursor: pointer;
+    }
+    .quick-tile:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    .quick-tile-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .quick-tile-label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+    }
+    .quick-tile-desc {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Two-column lower area ──────────────────────────── */
+    .lower-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--spacing-6);
+      margin-bottom: var(--spacing-12);
+      align-items: start;
+    }
+    @media (max-width: 960px) { .lower-grid { grid-template-columns: 1fr; } }
+
+    /* ── Recent Activity table ──────────────────────────── */
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: var(--spacing-5) var(--spacing-6);
+      border-bottom: 1px solid var(--color-border);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+    }
+
+    .activity-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+    .activity-table th {
+      text-align: left;
+      padding: var(--spacing-3) var(--spacing-4);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    .activity-table td {
+      padding: var(--spacing-3) var(--spacing-4);
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+      vertical-align: middle;
+    }
+    .activity-table tr:last-child td { border-bottom: 0; }
+    .activity-table tbody tr {
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .activity-table tbody tr:hover { background: var(--color-bg-hover, #F1F5F9); }
+    .activity-table .td-mono {
+      font-family: var(--font-mono, monospace);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Chart ──────────────────────────────────────────── */
+    .chart-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .chart-bars {
+      padding: var(--spacing-4) var(--spacing-5) var(--spacing-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-4);
+    }
+    .chart-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-1);
+    }
+    .chart-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .chart-row-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+    }
+    .chart-row-count {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+    }
+    .chart-track {
+      height: 10px;
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .chart-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.8s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── Loading skeleton rows ──────────────────────────── */
+    .skel-row {
+      display: flex;
+      gap: var(--spacing-3);
+      padding: var(--spacing-3) var(--spacing-4);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .skel-row:last-child { border-bottom: 0; }
+    .skel-line { background: var(--color-border); border-radius: var(--radius-sm); height: 0.85rem; animation: pulse 1.5s infinite; }
+
+    #activity-skeleton { display: block; }
+    #activity-table-wrap { display: none; }
+    #chart-skeleton { display: block; }
+    #chart-wrap { display: none; }
+    #stats-skeleton .stat-skeleton { display: block; }
+  </style>
+</head>
+<body>
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/landing.html" class="navbar-brand">⚡ Tekpair</a>
+      <div class="navbar-links">
+        <a href="/admin/dashboard.html" class="navbar-link active">Dashboard</a>
+        <a href="/admin/providers.html" class="navbar-link">Providers</a>
+        <a href="/admin/categories.html" class="navbar-link">Categories</a>
+        <a href="/admin/bookings.html" class="navbar-link">Bookings</a>
+        <a href="/admin/reviews.html" class="navbar-link">Reviews</a>
+      </div>
+      <div class="navbar-actions">
+        <span data-auth="guest" style="display:none;" class="navbar-actions">
+          <a href="/index.html" class="btn btn-primary btn-sm">Sign In</a>
+        </span>
+        <span data-auth="user" style="display:none;" class="navbar-actions">
+          <img data-user-avatar class="navbar-avatar" src="" alt="" style="display:none;" />
+          <span data-user-name class="navbar-user-name" style="font-size:var(--font-size-sm);font-weight:500;"></span>
+          <button onclick="logout()" class="btn btn-outline btn-sm">Sign Out</button>
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <main class="container">
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <p id="dash-sub">Loading…</p>
+    </div>
+
+    <!-- Stats row -->
+    <div id="stats-row" class="stats-row">
+      <div class="stat-card accent-blue">
+        <div class="stat-card-icon">👥</div>
+        <div class="stat-card-label">Total Users</div>
+        <div class="stat-card-value" id="stat-users"><span class="stat-skeleton"></span></div>
+      </div>
+      <div class="stat-card accent-green">
+        <div class="stat-card-icon">🔧</div>
+        <div class="stat-card-label">Total Providers</div>
+        <div class="stat-card-value" id="stat-providers"><span class="stat-skeleton"></span></div>
+      </div>
+      <div class="stat-card accent-warn">
+        <div class="stat-card-icon">📋</div>
+        <div class="stat-card-label">Total Bookings</div>
+        <div class="stat-card-value" id="stat-bookings"><span class="stat-skeleton"></span></div>
+      </div>
+      <div class="stat-card accent-red">
+        <div class="stat-card-icon">⏳</div>
+        <div class="stat-card-label">Pending Approvals</div>
+        <div class="stat-card-value" id="stat-pending"><span class="stat-skeleton"></span></div>
+      </div>
+    </div>
+
+    <!-- Quick action tiles -->
+    <h2 class="section-title">Quick Actions</h2>
+    <div class="quick-tiles">
+      <a href="/admin/providers.html" class="quick-tile">
+        <div class="quick-tile-icon">🔧</div>
+        <div class="quick-tile-label">Manage Providers</div>
+        <div class="quick-tile-desc">Approve, reject, suspend service providers</div>
+      </a>
+      <a href="/admin/categories.html" class="quick-tile">
+        <div class="quick-tile-icon">🗂️</div>
+        <div class="quick-tile-label">Manage Categories</div>
+        <div class="quick-tile-desc">Add or edit service categories</div>
+      </a>
+      <a href="/admin/reviews.html" class="quick-tile">
+        <div class="quick-tile-icon">⭐</div>
+        <div class="quick-tile-label">Moderate Reviews</div>
+        <div class="quick-tile-desc">Review and moderate customer feedback</div>
+      </a>
+      <a href="/admin/bookings.html" class="quick-tile">
+        <div class="quick-tile-icon">📅</div>
+        <div class="quick-tile-label">All Bookings</div>
+        <div class="quick-tile-desc">View and manage every booking</div>
+      </a>
+    </div>
+
+    <!-- Lower two-column section -->
+    <div class="lower-grid">
+
+      <!-- Recent Activity -->
+      <div class="panel">
+        <div class="panel-head">Recent Activity <span style="color:var(--color-text-muted);font-weight:400;">— last 10 bookings</span></div>
+        <div id="activity-skeleton">
+          <div class="skel-row"><div class="skel-line" style="width:20%;"></div><div class="skel-line" style="width:18%;"></div><div class="skel-line" style="width:15%;"></div><div class="skel-line" style="width:12%;"></div></div>
+          <div class="skel-row"><div class="skel-line" style="width:22%;"></div><div class="skel-line" style="width:14%;"></div><div class="skel-line" style="width:16%;"></div><div class="skel-line" style="width:10%;"></div></div>
+          <div class="skel-row"><div class="skel-line" style="width:18%;"></div><div class="skel-line" style="width:20%;"></div><div class="skel-line" style="width:13%;"></div><div class="skel-line" style="width:14%;"></div></div>
+          <div class="skel-row"><div class="skel-line" style="width:25%;"></div><div class="skel-line" style="width:16%;"></div><div class="skel-line" style="width:10%;"></div><div class="skel-line" style="width:12%;"></div></div>
+          <div class="skel-row"><div class="skel-line" style="width:19%;"></div><div class="skel-line" style="width:18%;"></div><div class="skel-line" style="width:15%;"></div><div class="skel-line" style="width:11%;"></div></div>
+        </div>
+        <div id="activity-table-wrap">
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Provider</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="activity-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bookings by Status chart -->
+      <div class="chart-panel">
+        <div class="panel-head">Bookings by Status</div>
+        <div id="chart-skeleton" class="chart-bars">
+          <div class="chart-row" style="opacity:0.4;"><div class="skel-line" style="width:60%;height:0.7rem;"></div><div class="chart-track"><div class="chart-fill" style="width:60%;background:var(--color-border);"></div></div></div>
+          <div class="chart-row" style="opacity:0.4;"><div class="skel-line" style="width:40%;height:0.7rem;"></div><div class="chart-track"><div class="chart-fill" style="width:40%;background:var(--color-border);"></div></div></div>
+          <div class="chart-row" style="opacity:0.4;"><div class="skel-line" style="width:25%;height:0.7rem;"></div><div class="chart-track"><div class="chart-fill" style="width:25%;background:var(--color-border);"></div></div></div>
+          <div class="chart-row" style="opacity:0.4;"><div class="skel-line" style="width:15%;height:0.7rem;"></div><div class="chart-track"><div class="chart-fill" style="width:15%;background:var(--color-border);"></div></div></div>
+        </div>
+        <div id="chart-wrap" class="chart-bars"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── Scripts ────────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/pages/admin-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tekpair — Premium Technical Services</title>
+    <link rel="icon" type="image/png" href="assets/Tekpair.png">
+    
+    <!-- Mona Sans Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@github/mona-sans@1.0.1/dist/Mona-Sans.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        mona: ['Mona Sans', 'Manrope', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        luxury: {
+                            black: '#0f172a', // Deep Navy
+                            gold: '#0050CD',  // Tekpair Trust Blue
+                            slate: '#f8fafc',
+                            gray: '#64748b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Manrope', sans-serif; background-color: #fafafa; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        /* Smooth Scroll & Selection */
+        html { scroll-behavior: smooth; }
+        ::selection { background: #0050CD; color: white; }
+
+        /* Premium Gradients */
+        .glass-nav { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(16px); 
+            border-bottom: 1px solid rgba(0, 80, 205, 0.1);
+        }
+        
+        .hero-bg {
+            background-color: #ffffff;
+            /* Cool, Trustable Blue Gradient */
+            background-image: 
+                radial-gradient(at 100% 0%, hsla(210, 40%, 96%, 1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(220, 50%, 97%, 1) 0px, transparent 50%);
+        }
+
+        /* Card Effects */
+        .service-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-900 antialiased">
+
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full top-0 z-50 transition-all duration-300 border-b border-gray-100/50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between font-mona">
+            
+            <!-- Logo -->
+            <a href="landing.html" class="flex items-center gap-2 group">
+                <img src="assets/tekpair.svg" alt="Tekpair" class="h-15 w-auto group-hover:scale-105 transition-transform duration-300">
+            </a>
+
+            <!-- Center Navigation -->
+            <div class="hidden md:flex items-center space-x-8 text-[15px] font-medium text-slate-500">
+                <a href="browse.html" class="hover:text-slate-900 transition-colors">Services</a>
+                <a href="#" class="hover:text-slate-900 transition-colors">About Us</a>
+                <a href="#" class="hover:text-slate-900 transition-colors">Contact</a>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-6">
+                    
+                    <!-- Guest: Login + Provider -->
+                    <div data-auth="guest" class="flex items-center gap-4">
+                        <a href="login.html" class="text-sm font-bold text-slate-700 hover:text-[#0050CD] px-5 py-2.5 rounded-full hover:bg-blue-50/50 transition-all duration-300">
+                            Login
+                        </a>
+                        <a href="login.html?mode=provider" class="relative group overflow-hidden bg-[#0050CD] text-white text-sm font-bold px-6 py-2.5 rounded-full shadow-[0_10px_20px_-10px_rgba(0,80,205,0.5)] hover:shadow-[0_20px_30px_-10px_rgba(0,80,205,0.4)] hover:-translate-y-0.5 transition-all duration-300 ring-4 ring-blue-50/50">
+                            <span class="relative z-10">Become a Provider</span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                        </a>
+                    </div>
+
+                    <!-- User: Avatar + Menu -->
+                    <div data-auth="user" style="display: none;" class="flex items-center gap-4">
+                        <div class="group relative">
+                            <div class="flex items-center gap-3 cursor-pointer">
+                                <span data-user-name class="font-medium text-slate-900 hidden sm:block">User</span>
+                                <div class="w-10 h-10 rounded-full border border-gray-200 p-0.5 ring-2 ring-gray-100">
+                                    <img data-user-avatar src="" class="w-full h-full rounded-full object-cover">
+                                </div>
+                            </div>
+                            
+                            <!-- Dropdown Menu -->
+                            <div class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 hidden group-hover:block z-50 overflow-hidden text-left">
+                                <div class="px-4 py-3 bg-gray-50/50 border-b border-gray-100">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Account</p>
+                                </div>
+                                <a href="bookings.html" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">My Bookings</a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="javascript:void(0)" onclick="logout()" class="block px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium">Sign Out</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative bg-white pt-32 pb-20 overflow-hidden font-mona">
+        <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
+            
+            <!-- Hero Text -->
+            <h1 class="text-5xl md:text-7xl font-extrabold text-[#0F172A] leading-[1.1] tracking-tight mb-6">
+                Home Experts at <br class="hidden md:block" />
+                Your <span class="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-blue-100/50 rounded-2xl mx-2 align-middle text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" class="w-8 h-8 md:w-10 md:h-10"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Door
+            </h1>
+            
+            <p class="font-sans text-gray-500 text-base md:text-lg max-w-xl mx-auto mb-12 font-normal leading-relaxed">
+                Expert home services, delivered to your doorstep – get reliable handyman solutions with ease. Fast, professional, and tailored to your needs.
+            </p>
+
+            <!-- Search Bar -->
+            <div class="flex justify-center mb-16 relative z-20">
+                <form action="/browse.html" class="flex flex-col md:flex-row items-center bg-white p-2 md:p-1.5 rounded-2xl md:rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 max-w-3xl w-full transition-all focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.12)] focus-within:-translate-y-1">
+                    
+                    <!-- Location Input -->
+                    <div class="relative w-full md:w-[35%] border-b md:border-b-0 md:border-r border-gray-100 px-6 py-4 md:py-3 flex items-center md:rounded-l-full hover:bg-gray-50/50 transition-colors group cursor-text" onclick="this.querySelector('input').focus()">
+                        <div class="mr-4 p-2 bg-blue-50 text-blue-600 rounded-full group-focus-within:bg-blue-600 group-focus-within:text-white transition-colors duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </div>
+                        <div class="flex-1 text-left">
+                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-0.5">Location</label>
+                            <input type="text" placeholder="Pin Code" class="w-full outline-none text-slate-600 placeholder-slate-400 bg-transparent text-[15px] font-medium">
+                        </div>
+                    </div>
+
+                    <!-- Service Input -->
+                    <div class="relative w-full md:flex-1 px-6 py-4 md:py-3 flex items-center hover:bg-gray-50/50 transition-colors group cursor-text" onclick="this.querySelector('input').focus()">
+                        <div class="flex-1 text-left">
+                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-0.5">Service</label>
+                            <input type="text" name="q" placeholder="What services you are looking for?" class="w-full outline-none text-slate-600 placeholder-slate-400 bg-transparent text-[15px] font-medium truncate pr-2">
+                        </div>
+                    </div>
+
+                    <!-- Search Button -->
+                    <button type="submit" class="w-full md:w-auto m-1 md:ml-2 bg-blue-600 text-white h-12 md:h-14 px-8 rounded-xl md:rounded-full font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] whitespace-nowrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <span>Search</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Decorative Illustrations (Absolute) -->
+            <div class="hidden xl:block absolute top-[10%] left-[1%] w-80 h-auto -z-10 animate-float" style="animation-duration: 6s;">
+               <!-- Left Video: Slightly higher, tilted left -->
+               <div class="relative rounded-[2rem] overflow-hidden transform -rotate-6 border-[6px] border-white">
+                   <video autoplay muted loop playsinline class="w-full h-auto object-cover opacity-90">
+                        <source src="assets/hero1.mp4" type="video/mp4">
+                   </video>
+               </div>
+            </div>
+            
+            <div class="hidden xl:block absolute bottom-[47%] right-[-4%] w-80 h-auto -z-10 animate-float" style="animation-duration: 8s; animation-delay: 1s;">
+                <!-- Right Video: Slightly lower, tilted right -->
+                <div class="relative rounded-[2rem] overflow-hidden transform rotate-6 border-[6px] border-white">
+                    <video autoplay muted loop playsinline class="w-full h-auto object-cover opacity-90">
+                        <source src="assets/hero2.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-7xl mx-auto px-4">
+                <!-- Card 1 -->
+                <div class="relative group overflow-hidden rounded-3xl h-72 shadow-lg hover:shadow-2xl cursor-pointer bg-black transition-all duration-300">
+                    <img src="assets/hero_pic1.png" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-75 group-hover:opacity-60" alt="Fast Booking">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
+                    <div class="absolute inset-0 flex flex-col justify-between p-8">
+                        <div></div>
+                        <div class="text-left">
+                            <h3 class="text-white text-3xl font-bold leading-tight mb-3">Fast booking,<br>instant help</h3>
+                            <p class="text-white/70 text-sm font-medium">Get help within minutes</p>
+                        </div>
+                    </div>
+                    <div class="absolute top-6 right-6 bg-white/20 backdrop-blur-md rounded-full w-12 h-12 flex items-center justify-center border border-white/30 transition-all group-hover:scale-125 group-hover:bg-white/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="relative group overflow-hidden rounded-3xl h-72 shadow-lg hover:shadow-2xl cursor-pointer bg-black transition-all duration-300">
+                    <img src="assets/hero_pic3.png" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-75 group-hover:opacity-60" alt="Skilled Experts">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
+                    <div class="absolute inset-0 flex flex-col justify-between p-8">
+                        <div class="flex justify-end">
+                            <div class="bg-white/20 backdrop-blur-md rounded-full w-12 h-12 flex items-center justify-center shadow-lg transform rotate-45 group-hover:rotate-0 transition-all group-hover:bg-white/30 border-2 border-white/40">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                            </div>
+                        </div>
+                        <div class="text-left">
+                            <h3 class="text-white text-3xl font-bold leading-tight mb-3">Skilled experts,<br>reliable service</h3>
+                            <p class="text-white/70 text-sm font-medium">Certified professionals only</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="relative group overflow-hidden rounded-3xl h-72 shadow-lg hover:shadow-2xl cursor-pointer bg-black transition-all duration-300">
+                    <img src="assets/hero_pic2.png" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-75 group-hover:opacity-60" alt="Safe & Easy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
+                    <div class="absolute inset-0 flex flex-col justify-between p-8">
+                        <div class="flex justify-end">
+                            <div class="bg-white/20 backdrop-blur-md rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-all group-hover:scale-125 group-hover:bg-white/30 border-2 border-white/40">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                            </div>
+                        </div>
+                        <div class="text-left">
+                            <h3 class="text-white text-3xl font-bold leading-tight mb-3">Safe, easy,<br>on-demand</h3>
+                            <p class="text-white/70 text-sm font-medium">24/7 availability</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Services Categories -->
+    <section class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                
+                <!-- Left Section: Home Services Card -->
+                <div class="flex flex-col">
+                    <h2 class="text-[2.6rem] font-extrabold text-[#111] mb-7 leading-[1.15]">Home services at your doorstep</h2>
+                    
+                    <!-- Outer Box Container -->
+                    <div class="bg-white border-[1.5px] border-[#e8e8e8] rounded-[20px] p-7 flex flex-col flex-1">
+                        <p class="text-[1.05rem] font-semibold text-[#aaa] mb-6">What are you looking for?</p>
+
+                        <!-- Main Grid (First 6 items) -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <!-- Card 1: Women's Salon -->
+                            <div class="group flex flex-col items-center gap-2">
+                                <div class="w-full aspect-[1/0.72] bg-[#f4f4f4] rounded-[14px] flex items-center justify-center relative overflow-hidden group-hover:bg-[#ececec] group-hover:-translate-y-0.5 transition-all duration-200">
+                                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                        <source src="assets/block1.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <p class="text-center font-semibold text-[#222] text-[13px] leading-tight px-1">Salon & Spa</p>
+                            </div>
+
+                            <!-- Card 2: Men's Salon -->
+                            <div class="group flex flex-col items-center gap-2">
+                                <div class="w-full aspect-[1/0.72] bg-[#f4f4f4] rounded-[14px] flex items-center justify-center relative overflow-hidden group-hover:bg-[#ececec] group-hover:-translate-y-0.5 transition-all duration-200">
+                                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                        <source src="assets/block2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <p class="text-center font-semibold text-[#222] text-[13px] leading-tight px-1">Yoga Trainer</p>
+                            </div>
+
+                            <!-- Card 3: Cleaning -->
+                            <div class="group flex flex-col items-center gap-2">
+                                <div class="w-full aspect-[1/0.72] bg-[#f4f4f4] rounded-[14px] flex items-center justify-center relative overflow-hidden group-hover:bg-[#ececec] group-hover:-translate-y-0.5 transition-all duration-200">
+                                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                        <source src="assets/block3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <p class="text-center font-semibold text-[#222] text-[13px] leading-tight px-1">Cleaning & Pest Control</p>
+                            </div>
+
+                            <!-- Card 4: AC Repair -->
+                            <div class="group flex flex-col items-center gap-2">
+                                <div class="w-full aspect-[1/0.72] bg-[#f4f4f4] rounded-[14px] flex items-center justify-center relative overflow-hidden group-hover:bg-[#ececec] group-hover:-translate-y-0.5 transition-all duration-200">
+                                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                        <source src="assets/block4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <p class="text-center font-semibold text-[#222] text-[13px] leading-tight px-1">AC & Appliance Repair</p>
+                            </div>
+
+                            <!-- Card 5: Water Purifier -->
+                            <div class="group flex flex-col items-center gap-2">
+                                <div class="w-full aspect-[1/0.72] bg-[#f4f4f4] rounded-[14px] flex items-center justify-center relative overflow-hidden group-hover:bg-[#ececec] group-hover:-translate-y-0.5 transition-all duration-200">
+                                    <span class="absolute top-2 left-1/2 -translate-x-1/2 bg-[#22b573] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full tracking-wide shadow-sm z-10">Sale</span>
+                                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                        <source src="assets/block5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <p class="text-center font-semibold text-[#222] text-[13px] leading-tight px-1">Vehicle Repair</p>
+                            </div>
+
+                            <!-- Card 6: Electrician/Plumber -->
+                            <div class="group flex flex-col items-center gap-2">
+                                <div class="w-full aspect-[1/0.72] bg-[#f4f4f4] rounded-[14px] flex items-center justify-center relative overflow-hidden group-hover:bg-[#ececec] group-hover:-translate-y-0.5 transition-all duration-200">
+                                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                        <source src="assets/block6.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <p class="text-center font-semibold text-[#222] text-[13px] leading-tight px-1">Electrician, Plumber & Carpenter</p>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Rows (Wide Items) -->
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <!-- Card 7: Painting -->
+                            <div class="group flex items-center gap-3 bg-gradient-to-br from-[#f7f7f7] to-[#f1f1f1] border border-[#e8e8e8] rounded-[14px] p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                                <p class="font-semibold text-[#1f2937] text-[13px] leading-snug flex-1">Renovation & Fabrication</p>
+                                <video autoplay muted loop playsinline class="w-[68px] h-[68px] object-cover rounded-lg flex-shrink-0 shadow-sm">
+                                    <source src="assets/block7.mp4" type="video/mp4">
+                                </video>
+                            </div>
+
+                            <!-- Card 8: Wall Makeover -->
+                            <div class="group flex items-center gap-3 bg-gradient-to-br from-[#f7f7f7] to-[#f1f1f1] border border-[#e8e8e8] rounded-[14px] p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                                <p class="font-semibold text-[#1f2937] text-[13px] leading-snug flex-1">Movers & Storage</p>
+                                <video autoplay muted loop playsinline class="w-[68px] h-[68px] object-cover rounded-lg flex-shrink-0 shadow-sm">
+                                    <source src="assets/block8.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Bento Grid Images -->
+                <div class="hidden lg:grid grid-cols-3 gap-4 auto-rows-max h-full">
+                    <!-- Large Image Top Left (2x2) -->
+                    <div class="col-span-2 row-span-2">
+                        <div class="relative h-80 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all">
+                            <img src="assets/pic7.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Beauty Service">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent group-hover:from-black/80 transition"></div>
+                            <div class="absolute bottom-3 left-3 z-10 text-white text-sm font-bold tracking-wide">Cleaning & Pest Control</div>
+                        </div>
+                    </div>
+
+                    <!-- Small Image Top Right -->
+                    <div class="col-span-1 row-span-1">
+                        <div class="relative h-40 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all">
+                            <img src="assets/pic8.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Massage Service">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent group-hover:from-black/80 transition"></div>
+                            <div class="absolute bottom-3 left-3 z-10 text-white text-sm font-bold tracking-wide">Salon & Spa</div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Right -->
+                    <div class="col-span-1 row-span-2">
+                        <div class="relative h-80 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all">
+                            <img src="assets/pic9.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="AC Repair">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent group-hover:from-black/80 transition"></div>
+                            <div class="absolute bottom-3 left-3 z-10 text-white text-sm font-bold tracking-wide">Carpenter Service</div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Left -->
+                    <div class="col-span-1">
+                        <div class="relative h-40 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all">
+                            <img src="assets/pic10.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cleaning Service">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent group-hover:from-black/80 transition"></div>
+                            <div class="absolute bottom-3 left-3 z-10 text-white text-sm font-bold tracking-wide">Plumbing Service</div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Right -->
+                    <div class="col-span-1">
+                        <div class="relative h-40 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all">
+                            <img src="assets/pic11.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Plumbing Service">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent group-hover:from-black/80 transition"></div>
+                            <div class="absolute bottom-3 left-3 z-10 text-white text-sm font-bold tracking-wide">Sofa Cleaning</div>
+                        </div>
+                    </div>
+
+                    <!-- New Row: Additional Images -->
+                    <!-- Bottom Wide Image (2x1) -->
+                    <div class="col-span-2">
+                        <div class="relative h-40 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all">
+                            <img src="assets/pic6.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Block 6 Service">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent group-hover:from-black/80 transition"></div>
+                            <div class="absolute bottom-3 left-3 z-10 text-white text-sm font-bold tracking-wide">Renovation & Fabrication</div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Right (1x1) -->
+                    <div class="col-span-1">
+                        <div class="relative h-40 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all">
+                            <img src="assets/pic12.png" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Vehicle Repair">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent group-hover:from-black/80 transition"></div>
+                            <div class="absolute bottom-3 left-3 z-10 text-white text-sm font-bold tracking-wide">Vehicle Repair</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us (Dark Section) -->
+    <section class="py-24 bg-luxury-black text-white px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="text-3xl md:text-5xl font-serif mb-8 leading-tight">The Tekpair Standard <br> of Excellence.</h2>
+                <div class="space-y-8">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-luxury-gold text-xl">🛡️</div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">Verified Technical Experts</h4>
+                            <p class="text-gray-400 leading-relaxed">Every technician undergoes rigorous skill assessment and background verification. Only the top 5% make the cut.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-luxury-gold text-xl">⏱️</div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">Punctual & Professional</h4>
+                            <p class="text-gray-400 leading-relaxed">We respect your time. Our pros arrive on schedule, equipped with the right tools to get the job done efficiently.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-luxury-gold text-xl">💎</div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">Satisfaction Guaranteed</h4>
+                            <p class="text-gray-400 leading-relaxed">If you're not satisfied with the service quality, we'll make it right. That's the Tekpair promise.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=2070&auto=format&fit=crop" class="rounded-2xl opacity-80" alt="Tools">
+                <div class="absolute -bottom-8 -left-8 bg-white text-black p-8 rounded-tr-3xl max-w-xs shadow-2xl hidden md:block">
+                    <p class="font-serif text-2xl mb-2">"Flawless service."</p>
+                    <div class="flex items-center gap-2">
+                         <div class="text-yellow-500">★★★★★</div>
+                         <span class="text-xs font-bold uppercase text-gray-400 ml-2">Verified Review</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Stats -->
+    <section class="py-20 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-gray-100">
+                <div class="text-center px-4">
+                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">15k+</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Repairs Completed</div>
+                </div>
+                <div class="text-center px-4">
+                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">98%</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Success Rate</div>
+                </div>
+                <div class="text-center px-4">
+                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">4.9</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Average Rating</div>
+                </div>
+                <div class="text-center px-4">
+                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">24h</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Turnaround Time</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-24 pb-12 border-t border-gray-100">
+        <!-- Logo & Social -->
+        <div class="max-w-7xl mx-auto px-6 mb-16 grid grid-cols-1 md:grid-cols-12 gap-12">
+            <div class="md:col-span-4">
+                <a href="/" class="block mb-6">
+                    <img src="assets/tekpair_logo.png" alt="Tekpair" class="h-10 w-auto">
+                </a>
+                <p class="text-gray-500 leading-relaxed mb-8 max-w-sm">
+                    Elevating home technical services. We connect discerning homeowners with the industry's most skilled professionals.
+                </p>
+                <!-- Social Icons -->
+                 <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition">X</a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition">in</a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition">Ig</a>
+                </div>
+            </div>
+            
+            <!-- Links -->
+            <div class="md:col-span-2 md:col-start-7">
+                <h5 class="font-bold text-gray-900 mb-6 uppercase text-xs tracking-widest">Services</h5>
+                <ul class="space-y-4 text-sm text-gray-500 font-medium">
+                    <li><a href="#" class="hover:text-black transition">AC Repair</a></li>
+                    <li><a href="#" class="hover:text-black transition">Electrical</a></li>
+                    <li><a href="#" class="hover:text-black transition">Smart Home</a></li>
+                    <li><a href="#" class="hover:text-black transition">Plumbing</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-2">
+                <h5 class="font-bold text-gray-900 mb-6 uppercase text-xs tracking-widest">Company</h5>
+                <ul class="space-y-4 text-sm text-gray-500 font-medium">
+                    <li><a href="#" class="hover:text-black transition">About Tekpair</a></li>
+                    <li><a href="#" class="hover:text-black transition">Careers</a></li>
+                    <li><a href="/login.html?mode=provider" class="text-luxury-gold hover:text-blue-800 transition">For Pros</a></li>
+                </ul>
+            </div>
+            <div class="md:col-span-2">
+                <h5 class="font-bold text-gray-900 mb-6 uppercase text-xs tracking-widest">Support</h5>
+                <ul class="space-y-4 text-sm text-gray-500 font-medium">
+                    <li><a href="#" class="hover:text-black transition">Help Center</a></li>
+                    <li><a href="#" class="hover:text-black transition">Terms</a></li>
+                    <li><a href="#" class="hover:text-black transition">Privacy</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Bottom Bar -->
+        <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400 font-medium">
+            <p>&copy; 2026 Tekpair Inc. All rights reserved.</p>
+            <div class="flex gap-6 mt-4 md:mt-0">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/notifications.js"></script>
+    <script>
+        // Ensure auth status is checked and fallback is hidden if JS works
+        window.addEventListener('DOMContentLoaded', () => {
+            const fallback = document.getElementById('auth-fallback');
+            if (fallback) {
+                // We keep it visible until we are sure auth.js has initialized
+                setTimeout(() => {
+                    const guest = document.querySelector('[data-auth="guest"]');
+                    const user = document.querySelector('[data-auth="user"]');
+                    if (guest.style.display !== 'none' || user.style.display !== 'none') {
+                        fallback.style.display = 'none';
+                    }
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Page Not Found | Tekpair</title>
+
+  <link rel="icon" type="image/png" href="assets/Tekpair.png">
+  <meta name="description" content="The page you're looking for doesn't exist on Tekpair.">
+  <meta name="robots" content="noindex">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Layout ──────────────────────────────────────────────── */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-12) var(--spacing-4);
+    }
+
+    /* ── 404 card ────────────────────────────────────────────── */
+    .notfound-wrap {
+      text-align: center;
+      max-width: 540px;
+      width: 100%;
+    }
+
+    /* ── CSS Art — broken wrench illustration ─────────────────── */
+    .art-stage {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto var(--spacing-8);
+      user-select: none;
+    }
+
+    /* Big emoji wrench */
+    .art-wrench {
+      font-size: 5rem;
+      line-height: 1;
+      display: block;
+      animation: wobble 3s ease-in-out infinite;
+    }
+
+    /* "404" glow badge behind the wrench */
+    .art-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%,
+        #EFF6FF 0%, #DBEAFE 50%, #BFDBFE 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: -1;
+    }
+    .art-badge-text {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #1d4ed8;
+      letter-spacing: -3px;
+      opacity: 0.25;
+    }
+
+    /* Orbiting dots */
+    .art-orbit {
+      position: absolute;
+      inset: 0;
+      animation: orbit 8s linear infinite;
+    }
+    .art-dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      opacity: 0.6;
+    }
+    .art-dot-1 { top: 8px;  left: 50%; transform: translateX(-50%); }
+    .art-dot-2 { bottom: 8px; left: 50%; transform: translateX(-50%); opacity: 0.35; background: #3b82f6; }
+    .art-dot-3 { left: 8px;  top: 50%; transform: translateY(-50%); opacity: 0.2; background: #60a5fa; }
+
+    /* Screws decoration */
+    .art-screws {
+      position: absolute;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      bottom: 12px;
+    }
+    .art-screw {
+      font-size: 1rem;
+      animation: spin-screw 4s linear infinite;
+    }
+    .art-screw:nth-child(2) { animation-direction: reverse; animation-duration: 3s; }
+
+    @keyframes wobble {
+      0%, 100% { transform: rotate(-8deg) scale(1); }
+      25%        { transform: rotate(4deg)  scale(1.05); }
+      75%        { transform: rotate(-4deg) scale(0.98); }
+    }
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes spin-screw {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* ── Text ─────────────────────────────────────────────────── */
+    .notfound-code {
+      font-size: 5rem;
+      font-weight: 900;
+      letter-spacing: -4px;
+      line-height: 1;
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--spacing-3);
+    }
+
+    .notfound-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-3);
+    }
+
+    .notfound-desc {
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--spacing-8);
+    }
+
+    /* ── Actions ──────────────────────────────────────────────── */
+    .notfound-actions {
+      display: flex;
+      gap: var(--spacing-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Suggestions ──────────────────────────────────────────── */
+    .notfound-suggestions {
+      margin-top: var(--spacing-10);
+      padding-top: var(--spacing-8);
+      border-top: 1px solid var(--color-border);
+    }
+    .notfound-suggestions-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--spacing-4);
+    }
+    .suggestion-links {
+      display: flex;
+      gap: var(--spacing-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .suggestion-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      padding: var(--spacing-2) var(--spacing-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      background: var(--color-surface);
+      transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+    }
+    .suggestion-link:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--color-primary-50);
+    }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .notfound-code { font-size: 4rem; }
+      .notfound-title { font-size: var(--font-size-xl); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/landing.html" class="nav-brand">🔧 Tek<span style="color:var(--color-primary)">pair</span></a>
+    <div class="nav-links">
+      <a href="/landing.html" class="nav-link">Home</a>
+      <a href="/bookings.html" class="nav-link" data-role-show="customer" style="display:none;">My Bookings</a>
+      <a href="/provider/dashboard.html" class="nav-link" data-role-show="provider" style="display:none;">Dashboard</a>
+      <a href="/admin/dashboard.html" class="nav-link" data-role-show="admin" style="display:none;">Admin</a>
+      <div data-auth="guest" style="display:none;gap:var(--spacing-2);" class="nav-links">
+        <a href="/index.html" class="btn btn-primary btn-sm">Sign In</a>
+      </div>
+      <div data-auth="user" style="display:none;" class="nav-dropdown" id="user-menu">
+        <button style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;"
+          onclick="document.getElementById('user-menu').classList.toggle('open')">
+          <img data-user-avatar src="" alt="avatar" class="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+          <span data-user-name class="text-sm font-medium hide-mobile"></span>
+          <span style="font-size:0.6rem;color:var(--color-text-muted);">▼</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <div class="nav-dropdown-divider"></div>
+          <button class="nav-dropdown-item danger" onclick="logout()">🚪 Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main>
+  <div class="notfound-wrap slide-up">
+
+    <!-- CSS art stage -->
+    <div class="art-stage">
+      <div class="art-badge">
+        <span class="art-badge-text">404</span>
+      </div>
+      <div class="art-orbit">
+        <div class="art-dot art-dot-1"></div>
+        <div class="art-dot art-dot-2"></div>
+        <div class="art-dot art-dot-3"></div>
+      </div>
+      <span class="art-wrench">🔧</span>
+      <div class="art-screws">
+        <span class="art-screw">⚙️</span>
+        <span class="art-screw">⚙️</span>
+      </div>
+    </div>
+
+    <!-- Headline -->
+    <div class="notfound-code">404</div>
+    <h1 class="notfound-title">Page Not Found</h1>
+    <p class="notfound-desc">
+      Looks like this page got lost in the toolbox.<br>
+      The link might be broken, or the page may have been moved.
+    </p>
+
+    <!-- CTA -->
+    <div class="notfound-actions">
+      <a href="/landing.html" class="btn btn-primary">🏠 Back to Home</a>
+      <button class="btn btn-secondary" onclick="history.back()">← Go Back</button>
+    </div>
+
+    <!-- Quick links -->
+    <div class="notfound-suggestions">
+      <div class="notfound-suggestions-title">Or try one of these</div>
+      <div class="suggestion-links">
+        <a href="/landing.html" class="suggestion-link">🔍 Browse Services</a>
+        <a href="/bookings.html" class="suggestion-link">📅 My Bookings</a>
+        <a href="/index.html" class="suggestion-link">👤 Sign In</a>
+        <a href="/provider/dashboard.html" class="suggestion-link">🛠 Provider Dashboard</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════ -->
+<footer style="text-align:center;padding:var(--spacing-6);font-size:var(--font-size-sm);color:var(--color-text-muted);border-top:1px solid var(--color-border);">
+  © 2026 Tekpair — All rights reserved
+</footer>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase.js"></script>
+<script src="/js/auth.js"></script>
+
+</body>
+</html>

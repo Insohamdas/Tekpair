@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Services — Tekpair</title>
+    <link rel="icon" type="image/png" href="assets/Tekpair.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Browse specific tweaks */
+        body { background-color: #f8fafc; font-family: 'Manrope', sans-serif; }
+        .browse-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .filters-bar { 
+            background: white; padding: 1.5rem; border-radius: 1rem; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            margin-bottom: 2rem;
+        }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e293b; }
+        .grid-layout { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        
+        /* Loader */
+        .page-loader { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease, visibility 0.6s; }
+        .page-loader.loaded { opacity: 0; visibility: hidden; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #2563EB; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="font-inter">
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+    <script>
+        // Force loaded state quickly
+        window.addEventListener('load', () => {
+            const el = document.getElementById('page-loader');
+            if(el) { el.classList.add('loaded'); setTimeout(() => el.remove(), 400); }
+        });
+        setTimeout(() => {
+            const el = document.getElementById('page-loader');
+            if(el && !el.classList.contains('loaded')) { 
+                el.classList.add('loaded'); 
+                setTimeout(() => el.remove(), 400); 
+            }
+        }, 1200);
+    </script>
+
+
+    <!-- Nav -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex flex-shrink-0 items-center gap-2">
+                    <a href="/" class="flex items-center gap-2">
+                        <img src="assets/tekpair_logo.png" alt="Tekpair" class="h-8 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                    <a href="/browse.html" class="text-gray-900 font-medium px-3 py-2 border-b-2" style="border-color: var(--color-primary)">Browse</a>
+                    <a href="/bookings.html" class="text-gray-500 hover:text-gray-900 font-medium px-3 py-2">My Bookings</a>
+                </div>
+
+                <!-- Auth Buttons -->
+                <div class="flex items-center space-x-4">
+                     <!-- Guest -->
+                    <div data-auth="guest" class="hidden flex space-x-3">
+                        <a href="/index.html" class="text-gray-600 hover:text-gray-900 font-medium">Log in</a>
+                        <a href="/index.html" class="btn btn-primary btn-sm">Sign up</a>
+                    </div>
+                    <!-- User -->
+                    <div data-auth="user" class="hidden flex items-center gap-3 cursor-pointer relative group">
+                        <span data-user-name class="text-sm font-medium text-gray-700 hidden sm:block"></span>
+                        <img data-user-avatar src="" class="h-8 w-8 rounded-full bg-gray-200 object-cover border border-gray-200">
+                        <!-- Dropdown -->
+                        <div class="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 hidden group-hover:block">
+                            <a href="/bookings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Bookings</a>
+                            <a href="#" id="btn-logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="browse-container">
+        
+        <!-- Search & Filter -->
+        <div class="filters-bar">
+             <div class="form-group mb-0">
+                <label class="form-label text-xs uppercase tracking-wide text-gray-500 font-bold mb-1">Search</label>
+                <input type="text" id="search-input" class="form-input w-full" placeholder="Keyword (e.g. Cleaning)">
+            </div>
+             <div class="form-group mb-0">
+                <label class="form-label text-xs uppercase tracking-wide text-gray-500 font-bold mb-1">Category</label>
+                <select id="filter-category" class="form-select w-full" onchange="applyFilters()">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="form-group mb-0">
+                <label class="form-label text-xs uppercase tracking-wide text-gray-500 font-bold mb-1">City</label>
+                <input type="text" id="filter-city" class="form-input w-full" placeholder="e.g. Mumbai" oninput="debouncedFilter()">
+            </div>
+             <div class="form-group mb-0">
+                <label class="form-label text-xs uppercase tracking-wide text-gray-500 font-bold mb-1">Area</label>
+                <input type="text" id="filter-area" class="form-input w-full" placeholder="e.g. Andheri" oninput="debouncedFilter()">
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <h2 class="section-title">Explore Categories</h2>
+        <div id="categories-grid" class="grid-layout mb-12">
+            <!-- Loaded by JS -->
+            <div class="p-8 text-center text-gray-400">Loading categories...</div>
+        </div>
+
+        <!-- Providers -->
+        <div id="providers-section">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="section-title mb-0">Top Professionals</h2>
+                <span id="providers-count-text" class="text-sm text-gray-500">Loading...</span>
+            </div>
+            
+            <div id="providers-grid" class="grid-layout">
+                <!-- Loaded by JS -->
+                <div class="col-span-full p-12 text-center">
+                    <div class="loader mx-auto"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/supabase.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/pages/browse.js"></script>
+</body>
+</html>

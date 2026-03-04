@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Categories — Tekpair Admin</title>
+
+  <link rel="icon" type="image/png" href="../assets/Tekpair.png">
+  <meta name="description" content="Manage service categories offered on the Tekpair platform.">
+  <meta name="robots" content="noindex">
+  <meta property="og:title" content="Service Categories — Tekpair Admin">
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Layout ─────────────────────────────────────────── */
+    .page-header {
+      padding-top: var(--spacing-8);
+      margin-bottom: var(--spacing-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-4);
+      flex-wrap: wrap;
+    }
+    .page-header h1 {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin: 0 0 var(--spacing-1);
+    }
+    .page-header p { color: var(--color-text-secondary); margin: 0; font-size: var(--font-size-sm); }
+
+    /* ── Panel / table ──────────────────────────────────── */
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: var(--spacing-12);
+    }
+    .panel-head {
+      padding: var(--spacing-4) var(--spacing-6);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-3);
+    }
+    .panel-head-title { font-weight: var(--font-weight-semibold); font-size: var(--font-size-sm); }
+
+    .cat-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
+    .cat-table th {
+      text-align: left;
+      padding: var(--spacing-3) var(--spacing-4);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    .cat-table td {
+      padding: var(--spacing-3) var(--spacing-4);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: middle;
+      color: var(--color-text);
+    }
+    .cat-table tr:last-child td { border-bottom: 0; }
+    .cat-table tbody tr { transition: background var(--transition-fast); }
+    .cat-table tbody tr:hover { background: var(--color-bg-hover, #F8FAFC); }
+
+    .td-icon { font-size: 1.4rem; text-align: center; }
+    .td-name { font-weight: var(--font-weight-medium); }
+    .td-desc { color: var(--color-text-secondary); max-width: 220px; }
+    .td-price { font-family: var(--font-mono, monospace); white-space: nowrap; }
+    .td-actions { white-space: nowrap; display: flex; gap: var(--spacing-2); align-items: center; }
+
+    /* Active toggle inside table */
+    .row-toggle {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      cursor: pointer;
+    }
+    .row-toggle input { display: none; }
+    .row-toggle-track {
+      width: 38px; height: 22px;
+      background: var(--color-border-dark);
+      border-radius: var(--radius-full);
+      transition: background var(--transition-fast);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .row-toggle-track::before {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      top: 3px; left: 3px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+      transition: transform var(--transition-fast);
+    }
+    .row-toggle input:checked + .row-toggle-track { background: var(--color-success); }
+    .row-toggle input:checked + .row-toggle-track::before { transform: translateX(16px); }
+
+    /* Icon picker ─────────────────────────────────────── */
+    .icon-picker-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--spacing-2);
+    }
+    .icon-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-3);
+      margin-bottom: var(--spacing-4);
+    }
+    .icon-btn {
+      width: 40px; height: 40px;
+      border: 2px solid transparent;
+      border-radius: var(--radius-md);
+      background: var(--color-bg);
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+    .icon-btn:hover { background: var(--color-border); }
+    .icon-btn.selected { border-color: var(--color-primary); background: #EFF6FF; }
+    .icon-preview {
+      width: 48px; height: 48px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: var(--color-bg);
+      flex-shrink: 0;
+    }
+    .icon-preview-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      margin-bottom: var(--spacing-4);
+    }
+
+    /* Modal ────────────────────────────────────────────── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-4);
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--color-surface);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-xl);
+      padding: var(--spacing-8);
+      width: 100%;
+      max-width: 520px;
+      max-height: 92vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-4);
+    }
+    .modal-title { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .modal-footer { display: flex; justify-content: flex-end; gap: var(--spacing-3); margin-top: var(--spacing-2); }
+
+    /* Empty / skeleton ─────────────────────────────────── */
+    .empty-cell { text-align: center; padding: var(--spacing-12) var(--spacing-4) !important; color: var(--color-text-muted); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+    .skel-line { height: .8rem; border-radius: var(--radius-sm); background: var(--color-border); animation: pulse 1.5s infinite; }
+  </style>
+</head>
+<body>
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/landing.html" class="navbar-brand">⚡ Tekpair</a>
+      <div class="navbar-links">
+        <a href="/admin/dashboard.html"  class="navbar-link">Dashboard</a>
+        <a href="/admin/providers.html"  class="navbar-link">Providers</a>
+        <a href="/admin/categories.html" class="navbar-link active">Categories</a>
+        <a href="/admin/bookings.html"   class="navbar-link">Bookings</a>
+        <a href="/admin/reviews.html"    class="navbar-link">Reviews</a>
+      </div>
+      <div class="navbar-actions">
+        <span data-auth="guest" style="display:none;">
+          <a href="/index.html" class="btn btn-primary btn-sm">Sign In</a>
+        </span>
+        <span data-auth="user" style="display:none;" class="navbar-actions">
+          <img data-user-avatar class="navbar-avatar" src="" alt="" style="display:none;" />
+          <span data-user-name class="navbar-user-name" style="font-size:var(--font-size-sm);font-weight:500;"></span>
+          <button onclick="logout()" class="btn btn-outline btn-sm">Sign Out</button>
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <main class="container">
+
+    <div class="page-header">
+      <div>
+        <h1>Service Categories</h1>
+        <p>Manage the categories available on the platform</p>
+      </div>
+      <button class="btn btn-primary" onclick="openCatModal()">＋ Add Category</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-head-title" id="cat-count">Loading…</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="cat-table">
+          <thead>
+            <tr>
+              <th style="width:56px;">Icon</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Base Price</th>
+              <th>Unit</th>
+              <th>Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cat-tbody">
+            <!-- skeleton rows -->
+            <tr><td colspan="7"><div style="padding:var(--spacing-3) var(--spacing-4);display:flex;flex-direction:column;gap:var(--spacing-3);">
+              <div class="skel-line" style="width:80%;"></div>
+              <div class="skel-line" style="width:65%;"></div>
+              <div class="skel-line" style="width:72%;"></div>
+            </div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Add / Edit Category modal ─────────────────────── -->
+  <div id="cat-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="cat-modal-title">
+    <div class="modal-box">
+      <h2 class="modal-title" id="cat-modal-title">Add Category</h2>
+
+      <!-- Icon picker -->
+      <div>
+        <div class="icon-picker-label">Choose Icon</div>
+        <div class="icon-preview-row">
+          <div class="icon-preview" id="icon-preview">🔧</div>
+          <span style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">Selected icon</span>
+        </div>
+        <div class="icon-picker" id="icon-picker"></div>
+      </div>
+
+      <!-- Name -->
+      <div class="form-group">
+        <label class="form-label" for="cat-name">Name <span class="required-star">*</span></label>
+        <input type="text" id="cat-name" class="form-input" placeholder="e.g. Plumbing" maxlength="60" required />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label" for="cat-desc">Description</label>
+        <textarea id="cat-desc" class="form-input" rows="3"
+          placeholder="Short description of this service category…" maxlength="300"></textarea>
+      </div>
+
+      <!-- Price row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-4);">
+        <div class="form-group">
+          <label class="form-label" for="cat-price">Base Price (₹)</label>
+          <input type="number" id="cat-price" class="form-input" placeholder="0" min="0" step="1" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cat-unit">Price Unit</label>
+          <select id="cat-unit" class="form-input">
+            <option value="per_hour">per hour</option>
+            <option value="per_job">per job</option>
+            <option value="per_sqft">per sqft</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Active toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--spacing-4);padding:var(--spacing-3) 0;border-top:1px solid var(--color-border);">
+        <div>
+          <div style="font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);">Active</div>
+          <div style="font-size:var(--font-size-xs);color:var(--color-text-muted);">Inactive categories won't appear on the booking page</div>
+        </div>
+        <label class="row-toggle" style="cursor:pointer;">
+          <input type="checkbox" id="cat-active" checked />
+          <span class="row-toggle-track"></span>
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCatModal()">Cancel</button>
+        <button class="btn btn-primary" id="cat-save-btn" onclick="saveCategory()">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Scripts ────────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/pages/admin-categories.js"></script>
+</body>
+</html>

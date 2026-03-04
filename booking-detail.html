@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Detail — Tekpair</title>
+
+  <link rel="icon" type="image/png" href="assets/Tekpair.png">
+  <meta name="description" content="View full details, status timeline, and actions for your Tekpair booking.">
+  <meta property="og:title" content="Booking Detail — Tekpair">
+  <meta property="og:description" content="Full booking details including status, provider info, and actions.">
+  <meta property="og:image" content="/og-image.png">
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Two-column layout ────────────────────────────── */
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: var(--spacing-6);
+      align-items: start;
+      padding-block: var(--spacing-8);
+    }
+    @media (max-width: 900px) {
+      .detail-layout { grid-template-columns: 1fr; }
+      .detail-sidebar { order: -1; }
+    }
+
+    /* ── Breadcrumb ───────────────────────────────────── */
+    .breadcrumb {
+      display: flex; align-items: center;
+      gap: var(--spacing-2);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--spacing-6);
+    }
+    .breadcrumb a { color: var(--color-primary); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb-sep { color: var(--color-border-dark); }
+
+    /* ── Booking header card ──────────────────────────── */
+    .detail-header {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-6);
+      margin-bottom: var(--spacing-5);
+    }
+    .detail-header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--spacing-4);
+      flex-wrap: wrap;
+    }
+    .detail-booking-id {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-1);
+    }
+    .detail-booking-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      flex-wrap: wrap;
+      margin-top: var(--spacing-2);
+    }
+    .detail-booking-date {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Horizontal timeline (full-size) ──────────────── */
+    .detail-timeline {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-6);
+      margin-bottom: var(--spacing-5);
+      overflow-x: auto;
+    }
+    .dt-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+      min-width: 72px;
+    }
+    .dt-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: calc(50% + 16px);
+      right: calc(-50% + 16px);
+      height: 2px;
+      background: var(--color-border);
+    }
+    .dt-step.done:not(:last-child)::after  { background: var(--color-primary); }
+    .dt-step.active:not(:last-child)::after { background: var(--color-primary-light); }
+
+    .dt-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border-dark);
+      background: var(--color-surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-muted);
+      position: relative; z-index: 1;
+      transition: all var(--transition-fast);
+    }
+    .dt-step.done .dt-dot   { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+    .dt-step.active .dt-dot { border-color: var(--color-primary); color: var(--color-primary); box-shadow: 0 0 0 4px var(--color-primary-light); }
+    .dt-step.cancelled .dt-dot,
+    .dt-step.rejected .dt-dot  { background: var(--color-danger); border-color: var(--color-danger); color: #fff; }
+
+    .dt-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--spacing-2);
+      text-align: center;
+      line-height: 1.3;
+    }
+    .dt-step.done .dt-label,
+    .dt-step.active .dt-label { color: var(--color-text); font-weight: var(--font-weight-medium); }
+    .dt-date {
+      font-size: 0.6rem;
+      color: var(--color-text-muted);
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* ── Status history (vertical log) ───────────────── */
+    .history-log {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .history-entry {
+      display: flex;
+      gap: var(--spacing-3);
+      position: relative;
+    }
+    .history-entry:not(:last-child) .history-line {
+      background: var(--color-border);
+    }
+    .history-icon-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 28px;
+    }
+    .history-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border-dark);
+      background: var(--color-surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      font-weight: var(--font-weight-bold);
+      flex-shrink: 0;
+    }
+    .history-line {
+      flex: 1;
+      width: 2px;
+      min-height: 24px;
+      background: var(--color-border);
+      margin: 0 auto;
+    }
+    .history-content {
+      flex: 1;
+      padding-bottom: var(--spacing-5);
+    }
+    .history-content-top {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      flex-wrap: wrap;
+      margin-bottom: 2px;
+    }
+    .history-who   { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+    .history-time  { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+    .history-note  { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: 2px; }
+
+    /* ── Image gallery (lightbox) ─────────────────────── */
+    .image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: var(--spacing-2);
+      margin-top: var(--spacing-3);
+    }
+    .gallery-thumb {
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .gallery-thumb:hover { transform: scale(1.03); box-shadow: var(--shadow-md); }
+
+    /* ── Lightbox overlay ─────────────────────────────── */
+    #lightbox {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: var(--radius-lg);
+      object-fit: contain;
+    }
+    #lightbox-close {
+      position: absolute;
+      top: var(--spacing-4); right: var(--spacing-4);
+      background: rgba(255,255,255,0.15);
+      border: none; color: #fff;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #lightbox-prev, #lightbox-next {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.15);
+      border: none; color: #fff;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    #lightbox-prev:hover, #lightbox-next:hover { background: rgba(255,255,255,0.3); }
+    #lightbox-prev { left: var(--spacing-4); }
+    #lightbox-next { right: var(--spacing-4); }
+
+    /* ── Pricing card ─────────────────────────────────── */
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-3) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+    .price-row-value { font-weight: var(--font-weight-semibold); color: var(--color-text); }
+    .price-row-value.final { font-size: var(--font-size-lg); color: var(--color-success); }
+
+    /* ── Reschedule request banner ────────────────────── */
+    .reschedule-card {
+      background: #fffbeb;
+      border: 1.5px solid var(--color-warning);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-5);
+    }
+    .reschedule-card-header {
+      display: flex; align-items: center; gap: var(--spacing-2);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--spacing-3);
+    }
+    .reschedule-actions { display: flex; gap: var(--spacing-2); margin-top: var(--spacing-3); }
+
+    /* ── Provider mini-card (right sidebar) ───────────── */
+    .provider-mini {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-4);
+    }
+    .provider-mini-avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto var(--spacing-3);
+      display: block;
+    }
+    .provider-mini-initials {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      font-weight: var(--font-weight-bold);
+      margin: 0 auto var(--spacing-3);
+    }
+    .provider-mini-name {
+      text-align: center;
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--spacing-1);
+    }
+    .provider-mini-rating {
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--spacing-3);
+    }
+    .contact-phone-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      padding: var(--spacing-3);
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+    }
+
+    /* ── Inline star rating input ─────────────────────── */
+    .star-picker { display: flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
+    .star-picker input[type="radio"] { display: none; }
+    .star-picker label {
+      font-size: 1.7rem;
+      color: var(--color-border-dark);
+      cursor: pointer;
+      transition: color var(--transition-fast);
+    }
+    .star-picker input:checked ~ label,
+    .star-picker label:hover,
+    .star-picker label:hover ~ label { color: #F59E0B; }
+
+    /* ── Action panel (sidebar) ───────────────────────── */
+    .action-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-4);
+    }
+    .action-panel-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--spacing-3);
+    }
+    .action-panel .btn + .btn { margin-top: var(--spacing-2); }
+
+    /* ── Section card reuse ───────────────────────────── */
+    .detail-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-5);
+    }
+    .detail-card-title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-4);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+    }
+    .detail-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-4);
+    }
+    @media (max-width: 500px) { .detail-grid-2 { grid-template-columns: 1fr; } }
+
+    .detail-field-label { font-size: var(--font-size-xs); color: var(--color-text-muted); font-weight: var(--font-weight-medium); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+    .detail-field-value { font-size: var(--font-size-sm); color: var(--color-text); }
+
+    /* ── Access denied / loading ──────────────────────── */
+    #page-skeleton { padding-block: var(--spacing-8); }
+    #access-denied { display: none; }
+    #page-content  { display: none; }
+    .denied-state {
+      text-align: center;
+      padding: var(--spacing-16) var(--spacing-4);
+    }
+    .denied-state-icon { font-size: 3rem; margin-bottom: var(--spacing-4); }
+    .denied-state-title { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-2); }
+    .denied-state-desc  { color: var(--color-text-secondary); margin-bottom: var(--spacing-6); }
+
+    /* ── File upload drop zone (complete-job) ─────────── */
+    .file-drop-zone {
+      border: 2px dashed var(--color-border-dark);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-6);
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+    .file-drop-zone:hover, .file-drop-zone.dragover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-50);
+    }
+    .file-drop-zone input[type="file"] { display: none; }
+    .complete-thumb-grid {
+      display: flex; flex-wrap: wrap; gap: var(--spacing-2);
+      margin-top: var(--spacing-3);
+    }
+    .complete-thumb {
+      width: 72px; height: 72px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--color-border);
+    }
+
+    /* ── Reviewed display ─────────────────────────────── */
+    .review-display .review-stars { font-size: 1.3rem; color: #F59E0B; margin-bottom: var(--spacing-1); }
+    .review-display .review-comment { font-size: var(--font-size-sm); color: var(--color-text-secondary); font-style: italic; }
+    .review-display .review-meta { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--spacing-1); }
+
+    /* ── Phone reveal animation ───────────────────────── */
+    .phone-reveal { display: none; }
+    .phone-reveal.shown {
+      display: flex;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/landing.html" class="nav-brand">🔧 Tek<span style="color:var(--color-primary)">pair</span></a>
+    <div class="nav-links">
+      <a href="/landing.html" class="nav-link">Home</a>
+      <a href="/bookings.html" class="nav-link" data-role-show="customer" style="display:none;">My Bookings</a>
+      <a href="/provider/dashboard.html" class="nav-link" data-role-show="provider" style="display:none;">Dashboard</a>
+      <a href="/admin/dashboard.html" class="nav-link" data-role-show="admin" style="display:none;">Admin</a>
+      <div data-auth="user" style="display:none;" class="nav-dropdown" id="user-menu">
+        <button style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;"
+          onclick="document.getElementById('user-menu').classList.toggle('open')">
+          <img data-user-avatar src="" alt="avatar" class="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+          <span data-user-name class="text-sm font-medium hide-mobile"></span>
+          <span style="font-size:0.6rem;color:var(--color-text-muted);">▼</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/profile.html" class="nav-dropdown-item">👤 My Profile</a>
+          <div class="nav-dropdown-divider"></div>
+          <button class="nav-dropdown-item danger" onclick="logout()">🚪 Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main>
+  <div class="container" style="max-width:1100px;">
+
+    <!-- ── Skeleton loading ──────────────────────────── -->
+    <div id="page-skeleton">
+      <div style="padding-top:var(--spacing-8);">
+        <div class="skeleton skeleton-text" style="width:220px;margin-bottom:var(--spacing-3);"></div>
+        <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-6);margin-bottom:var(--spacing-5);">
+          <div class="skeleton skeleton-text" style="width:160px;margin-bottom:var(--spacing-3);"></div>
+          <div class="skeleton skeleton-text" style="width:80%;margin-bottom:var(--spacing-2);"></div>
+          <div class="skeleton skeleton-text" style="width:55%;"></div>
+        </div>
+        <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-6);margin-bottom:var(--spacing-5);">
+          <div style="display:flex;justify-content:space-between;gap:16px;">
+            <div class="skeleton" style="width:32px;height:32px;border-radius:50%;"></div>
+            <div class="skeleton" style="flex:1;height:2px;margin-top:14px;"></div>
+            <div class="skeleton" style="width:32px;height:32px;border-radius:50%;"></div>
+            <div class="skeleton" style="flex:1;height:2px;margin-top:14px;"></div>
+            <div class="skeleton" style="width:32px;height:32px;border-radius:50%;"></div>
+            <div class="skeleton" style="flex:1;height:2px;margin-top:14px;"></div>
+            <div class="skeleton" style="width:32px;height:32px;border-radius:50%;"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;">
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-5);">
+              <div class="skeleton skeleton-text" style="width:120px;margin-bottom:var(--spacing-4);"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text" style="width:70%;"></div>
+            </div>
+            <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-5);">
+              <div class="skeleton skeleton-text" style="width:140px;margin-bottom:var(--spacing-4);"></div>
+              <div class="skeleton skeleton-text"></div>
+            </div>
+          </div>
+          <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-5);">
+            <div class="skeleton" style="width:64px;height:64px;border-radius:50%;margin:0 auto var(--spacing-3);"></div>
+            <div class="skeleton skeleton-text" style="width:60%;margin:0 auto var(--spacing-2);"></div>
+            <div class="skeleton skeleton-text" style="width:40%;margin:0 auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Access denied ─────────────────────────────── -->
+    <div id="access-denied">
+      <div class="denied-state">
+        <div class="denied-state-icon">🔒</div>
+        <div class="denied-state-title">Access Denied</div>
+        <p class="denied-state-desc">You don't have permission to view this booking.</p>
+        <a href="/landing.html" class="btn btn-primary">Back to Home</a>
+      </div>
+    </div>
+
+    <!-- ── Page content ───────────────────────────────── -->
+    <div id="page-content">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" id="breadcrumb-nav">
+        <a href="/landing.html">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="/bookings.html" id="back-link">My Bookings</a>
+        <span class="breadcrumb-sep">›</span>
+        <span id="bc-booking-id">Booking</span>
+      </nav>
+
+      <!-- Reschedule request banner (shown when reschedule_status = pending) -->
+      <div class="reschedule-card" id="reschedule-banner" style="display:none;">
+        <div class="reschedule-card-header">⏳ Reschedule Request Pending</div>
+        <div>
+          <span class="detail-field-label">Proposed New Time: </span>
+          <span id="reschedule-proposed-time" style="font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);"></span>
+        </div>
+        <div class="reschedule-actions" id="reschedule-review-actions" style="display:none;">
+          <button class="btn btn-success btn-sm" onclick="respondReschedule('accepted')">✓ Accept</button>
+          <button class="btn btn-danger btn-sm"  onclick="respondReschedule('rejected')">✕ Decline</button>
+        </div>
+        <div id="reschedule-awaiting-msg" style="display:none;margin-top:var(--spacing-3);font-size:var(--font-size-sm);color:var(--color-text-muted);">
+          Awaiting provider response…
+        </div>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="detail-layout">
+
+        <!-- ════ LEFT COLUMN ════════════════════════════ -->
+        <div class="detail-main">
+
+          <!-- 1. Booking header -->
+          <div class="detail-header">
+            <div class="detail-header-top">
+              <div>
+                <div class="detail-booking-id" id="hdr-booking-id">Booking #—</div>
+                <div class="detail-booking-meta">
+                  <span id="hdr-status-badge"></span>
+                  <span class="detail-booking-date" id="hdr-created-date"></span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--spacing-2);">
+                <span id="hdr-role-tag" style="font-size:var(--font-size-xs);background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:2px 10px;color:var(--color-text-secondary);"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Status Timeline -->
+          <div class="detail-timeline" id="status-timeline">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- 3. Status History log -->
+          <div class="detail-card">
+            <div class="detail-card-title">📋 Status History</div>
+            <div class="history-log" id="history-log">
+              <div class="skeleton skeleton-text" style="width:80%;margin-bottom:var(--spacing-2);"></div>
+              <div class="skeleton skeleton-text" style="width:60%;"></div>
+            </div>
+          </div>
+
+          <!-- 4. Service Details -->
+          <div class="detail-card">
+            <div class="detail-card-title">🔧 Service Details</div>
+            <div class="detail-grid-2">
+              <div>
+                <div class="detail-field-label">Category</div>
+                <div class="detail-field-value" id="svc-category">—</div>
+              </div>
+              <div>
+                <div class="detail-field-label">Provider</div>
+                <div class="detail-field-value">
+                  <a id="svc-provider-link" href="#" style="color:var(--color-primary);text-decoration:none;font-weight:var(--font-weight-medium);" id="svc-provider">—</a>
+                </div>
+              </div>
+              <div>
+                <div class="detail-field-label">Scheduled Time</div>
+                <div class="detail-field-value" id="svc-scheduled">—</div>
+              </div>
+              <div>
+                <div class="detail-field-label">Duration</div>
+                <div class="detail-field-value" id="svc-duration">—</div>
+              </div>
+              <div style="grid-column:1/-1;">
+                <div class="detail-field-label">Full Address</div>
+                <div class="detail-field-value" id="svc-address">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Customer Notes + images -->
+          <div class="detail-card" id="customer-content-card">
+            <div class="detail-card-title">💬 Customer Notes &amp; Images</div>
+            <p class="detail-field-value" id="cust-notes" style="margin-bottom:var(--spacing-3);"></p>
+            <div class="image-gallery" id="cust-images"></div>
+          </div>
+
+          <!-- 6. Provider Notes + before/after images -->
+          <div class="detail-card" id="provider-content-card" style="display:none;">
+            <div class="detail-card-title">📝 Provider Notes &amp; Work Images</div>
+            <p class="detail-field-value" id="prov-notes" style="color:var(--color-text-secondary);margin-bottom:var(--spacing-3);"></p>
+            <div style="display:flex;gap:var(--spacing-4);flex-wrap:wrap;margin-bottom:var(--spacing-3);">
+              <div id="before-img-section" style="display:none;">
+                <div class="detail-field-label" style="margin-bottom:var(--spacing-2);">Before</div>
+                <div class="image-gallery" id="before-images"></div>
+              </div>
+              <div id="after-img-section" style="display:none;">
+                <div class="detail-field-label" style="margin-bottom:var(--spacing-2);">After</div>
+                <div class="image-gallery" id="after-images"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7. Pricing card -->
+          <div class="detail-card">
+            <div class="detail-card-title">💰 Pricing</div>
+            <div id="pricing-rows">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </div>
+        <!-- ════ END LEFT COLUMN ═════════════════════════ -->
+
+        <!-- ════ RIGHT COLUMN (sidebar) ═════════════════ -->
+        <div class="detail-sidebar">
+
+          <!-- 1. Provider mini-card -->
+          <div class="provider-mini">
+            <div id="provider-avatar-container">
+              <!-- Rendered by JS -->
+            </div>
+            <div class="provider-mini-name" id="sidebar-provider-name">—</div>
+            <div class="provider-mini-rating" id="sidebar-provider-rating"></div>
+
+            <!-- Phone (shown only after confirmed+) -->
+            <div id="phone-section" style="display:none;margin-top:var(--spacing-3);">
+              <button class="btn btn-outline btn-sm" style="width:100%;" id="contact-btn" onclick="togglePhone()">📞 Show Contact</button>
+              <div class="contact-phone-row phone-reveal" id="phone-reveal">
+                <span>📞</span>
+                <span id="contact-phone-number" style="font-weight:var(--font-weight-semibold);"></span>
+                <a id="contact-tel-link" href="#" style="margin-left:auto;font-size:var(--font-size-xs);color:var(--color-primary);">Call</a>
+              </div>
+            </div>
+
+            <!-- Verified tag -->
+            <div style="text-align:center;margin-top:var(--spacing-3);">
+              <span id="verified-tag" style="display:none;font-size:var(--font-size-xs);background:#EFF6FF;color:var(--color-primary);border-radius:var(--radius-full);padding:2px 10px;font-weight:var(--font-weight-medium);">✓ Verified Provider</span>
+            </div>
+          </div>
+
+          <!-- 2. Review card (if completed) -->
+          <div class="detail-card" id="review-section" style="display:none;">
+            <div class="detail-card-title">⭐ Review</div>
+
+            <!-- Existing review display -->
+            <div id="review-display" class="review-display" style="display:none;"></div>
+
+            <!-- Inline review form (customer, no review yet) -->
+            <div id="review-form" style="display:none;">
+              <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);margin-bottom:var(--spacing-3);">Share your experience:</p>
+              <div class="form-group">
+                <label class="form-label">Rating <span class="required">*</span></label>
+                <div class="star-picker" id="star-picker">
+                  <input type="radio" name="review-rating" id="rs5" value="5" /><label for="rs5">★</label>
+                  <input type="radio" name="review-rating" id="rs4" value="4" /><label for="rs4">★</label>
+                  <input type="radio" name="review-rating" id="rs3" value="3" /><label for="rs3">★</label>
+                  <input type="radio" name="review-rating" id="rs2" value="2" /><label for="rs2">★</label>
+                  <input type="radio" name="review-rating" id="rs1" value="1" /><label for="rs1">★</label>
+                </div>
+                <span class="form-error" id="review-rating-err"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="review-comment-input">Comment (optional)</label>
+                <textarea class="form-textarea" id="review-comment-input" rows="3" placeholder="How was the service?"></textarea>
+              </div>
+              <div class="alert alert-danger" id="review-submit-err" style="display:none;">
+                <span class="alert-icon">⚠</span>
+                <div class="alert-body" id="review-submit-err-msg"></div>
+              </div>
+              <button class="btn btn-primary btn-sm" style="width:100%;margin-top:var(--spacing-2);" id="review-submit-btn" onclick="submitReview()">Submit Review</button>
+            </div>
+          </div>
+
+          <!-- 3. Action panel -->
+          <div class="action-panel" id="action-panel" style="display:none;">
+            <div class="action-panel-title">Actions</div>
+            <div id="action-buttons">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </div>
+        <!-- ════ END RIGHT COLUMN ════════════════════════ -->
+
+      </div>
+    </div><!-- #page-content -->
+
+  </div><!-- .container -->
+</main>
+
+<!-- ══ LIGHTBOX ══════════════════════════════════════════════ -->
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">×</button>
+  <button id="lightbox-prev"  onclick="lightboxNav(-1)">‹</button>
+  <img id="lightbox-img" src="" alt="Preview" />
+  <button id="lightbox-next"  onclick="lightboxNav(1)">›</button>
+</div>
+
+<!-- ══ CANCEL MODAL ══════════════════════════════════════════ -->
+<div class="modal" id="cancel-modal">
+  <div class="modal-overlay" onclick="closeCancelModal()"></div>
+  <div class="modal-content" style="max-width:460px;">
+    <div class="modal-header">
+      <h3>Cancel Booking</h3>
+      <button class="modal-close" onclick="closeCancelModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-warning" style="margin-bottom:var(--spacing-4);">
+        <span class="alert-icon">⚠</span>
+        <div class="alert-body">This action cannot be undone. Please provide a reason.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cancel-reason">Reason for cancellation <span class="required">*</span></label>
+        <textarea class="form-textarea" id="cancel-reason" rows="3" placeholder="e.g. My schedule changed…"></textarea>
+        <span class="form-error" id="cancel-reason-err"></span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCancelModal()">Keep Booking</button>
+      <button class="btn btn-danger" id="cancel-confirm-btn" onclick="confirmCancel()">Yes, Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REJECT MODAL (provider reject booking) ══════════════ -->
+<div class="modal" id="reject-modal">
+  <div class="modal-overlay" onclick="closeRejectModal()"></div>
+  <div class="modal-content" style="max-width:460px;">
+    <div class="modal-header">
+      <h3>Reject Booking Request</h3>
+      <button class="modal-close" onclick="closeRejectModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="reject-reason">Reason (optional)</label>
+        <textarea class="form-textarea" id="reject-reason" rows="3" placeholder="Reason for rejection…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeRejectModal()">Go Back</button>
+      <button class="btn btn-danger" id="reject-confirm-btn" onclick="confirmReject()">Reject Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD NOTES MODAL (provider) ═══════════════════════════ -->
+<div class="modal" id="notes-modal">
+  <div class="modal-overlay" onclick="closeNotesModal()"></div>
+  <div class="modal-content" style="max-width:500px;">
+    <div class="modal-header">
+      <h3>Add / Update Provider Notes</h3>
+      <button class="modal-close" onclick="closeNotesModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="provider-notes-input">Notes</label>
+        <textarea class="form-textarea" id="provider-notes-input" rows="5" placeholder="Notes visible to the customer…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeNotesModal()">Cancel</button>
+      <button class="btn btn-primary" id="notes-save-btn" onclick="saveNotes()">Save Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMPLETE JOB MODAL (provider) ════════════════════════ -->
+<div class="modal" id="complete-modal">
+  <div class="modal-overlay" onclick="closeCompleteModal()"></div>
+  <div class="modal-content" style="max-width:520px;">
+    <div class="modal-header">
+      <h3>Complete Job</h3>
+      <button class="modal-close" onclick="closeCompleteModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info" style="margin-bottom:var(--spacing-4);">
+        <span class="alert-icon">ℹ</span>
+        <div class="alert-body">Optionally upload before/after images and set the final price.</div>
+      </div>
+      <!-- Final price -->
+      <div class="form-group">
+        <label class="form-label" for="final-price-input">Final Price (₹)</label>
+        <input class="form-input" type="number" id="final-price-input" min="0" step="1" placeholder="Leave blank to keep estimated" />
+      </div>
+      <!-- Before images -->
+      <div class="form-group">
+        <label class="form-label">Before Images (optional, max 3)</label>
+        <div class="file-drop-zone" id="before-drop"
+             onclick="document.getElementById('before-file').click()"
+             ondragover="handleDragOver(event,'before-drop')"
+             ondragleave="handleDragLeave(event,'before-drop')"
+             ondrop="handleDrop(event,'before')">
+          <input type="file" id="before-file" multiple accept="image/*" onchange="handleFileSelect(event,'before')" />
+          <div style="font-size:1.5rem;margin-bottom:var(--spacing-2);">📷</div>
+          <div style="font-size:var(--font-size-sm);color:var(--color-text-muted);">Click or drag images here</div>
+        </div>
+        <div class="complete-thumb-grid" id="before-thumbs"></div>
+      </div>
+      <!-- After images -->
+      <div class="form-group">
+        <label class="form-label">After Images (optional, max 3)</label>
+        <div class="file-drop-zone" id="after-drop"
+             onclick="document.getElementById('after-file').click()"
+             ondragover="handleDragOver(event,'after-drop')"
+             ondragleave="handleDragLeave(event,'after-drop')"
+             ondrop="handleDrop(event,'after')">
+          <input type="file" id="after-file" multiple accept="image/*" onchange="handleFileSelect(event,'after')" />
+          <div style="font-size:1.5rem;margin-bottom:var(--spacing-2);">🏠</div>
+          <div style="font-size:var(--font-size-sm);color:var(--color-text-muted);">Click or drag images here</div>
+        </div>
+        <div class="complete-thumb-grid" id="after-thumbs"></div>
+      </div>
+      <!-- Upload progress -->
+      <div id="complete-upload-progress" style="display:none;">
+        <div style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--spacing-2);">Uploading images…</div>
+        <div style="background:var(--color-border);border-radius:var(--radius-full);height:6px;overflow:hidden;">
+          <div id="complete-progress-bar" style="height:100%;background:var(--color-primary);transition:width 0.3s;width:0%;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCompleteModal()">Cancel</button>
+      <button class="btn btn-success" id="complete-confirm-btn" onclick="confirmComplete()">✓ Mark as Completed</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══════════════════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/pages/booking-detail.js"></script>
+
+</body>
+</html>

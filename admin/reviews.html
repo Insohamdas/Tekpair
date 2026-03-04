@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Review Moderation — Tekpair Admin</title>
+
+  <link rel="icon" type="image/png" href="../assets/Tekpair.png">
+  <meta name="description" content="Moderate customer reviews and ratings on the Tekpair platform.">
+  <meta name="robots" content="noindex">
+  <meta property="og:title" content="Review Moderation — Tekpair Admin">
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Layout ─────────────────────────────────────────── */
+    .page-header {
+      padding-top: var(--spacing-8);
+      margin-bottom: var(--spacing-6);
+    }
+    .page-header h1 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: 0 0 var(--spacing-1); }
+    .page-header p  { color: var(--color-text-secondary); margin: 0; font-size: var(--font-size-sm); }
+
+    /* ── Summary stats ──────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-6);
+    }
+    @media (max-width: 860px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 460px) { .stats-row { grid-template-columns: 1fr; } }
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+    }
+    .stat-card-label { font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: var(--spacing-1); }
+    .stat-card-value { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-text); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+    .skel-val { height: 2rem; width: 50%; border-radius: var(--radius-md); background: var(--color-border); animation: pulse 1.5s infinite; display: inline-block; }
+
+    /* ── Filter bar ─────────────────────────────────────── */
+    .filter-bar {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-4) var(--spacing-5);
+      margin-bottom: var(--spacing-5);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-3);
+      align-items: center;
+    }
+    .filter-group { display: flex; gap: var(--spacing-1); }
+    .filter-btn {
+      padding: var(--spacing-1) var(--spacing-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      background: transparent;
+      font-family: var(--font-family);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .filter-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .filter-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+
+    /* star filter buttons */
+    .star-filter-btn {
+      padding: var(--spacing-1) var(--spacing-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      background: transparent;
+      font-family: var(--font-family);
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      color: var(--color-text-secondary);
+    }
+    .star-filter-btn:hover { border-color: #F59E0B; color: #F59E0B; }
+    .star-filter-btn.active { background: #F59E0B; border-color: #F59E0B; color: #fff; }
+
+    /* Search input */
+    .search-wrap {
+      position: relative;
+      margin-left: auto;
+      min-width: 220px;
+    }
+    .search-wrap-icon { position: absolute; left: var(--spacing-3); top: 50%; transform: translateY(-50%); color: var(--color-text-muted); pointer-events: none; font-size: .9rem; }
+    #review-search {
+      width: 100%;
+      padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) var(--spacing-9);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+    #review-search:focus { outline: none; border-color: var(--color-primary); }
+
+    /* ── Reviews cards ──────────────────────────────────── */
+    .reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-12);
+    }
+    .review-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: box-shadow var(--transition-base), opacity var(--transition-base);
+    }
+    .review-card.hidden-review {
+      opacity: .65;
+      border-left: 3px solid var(--color-danger);
+    }
+    .review-card:hover { box-shadow: var(--shadow-md); }
+    .review-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--spacing-4);
+      padding: var(--spacing-4) var(--spacing-5) var(--spacing-3);
+      flex-wrap: wrap;
+    }
+    .review-meta { display: flex; flex-direction: column; gap: 2px; }
+    .review-names {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+    }
+    .review-names span { color: var(--color-text-muted); font-weight: 400; }
+    .review-date { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+    .review-stars { font-size: 1.1rem; color: #F59E0B; letter-spacing: 1px; }
+    .review-card-body {
+      padding: 0 var(--spacing-5) var(--spacing-4);
+    }
+    .review-comment {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      font-style: italic;
+    }
+    .review-comment::before { content: '"'; }
+    .review-comment::after  { content: '"'; }
+    .review-card-foot {
+      border-top: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-3);
+      flex-wrap: wrap;
+    }
+    .review-booking-link {
+      font-size: var(--font-size-xs);
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    .review-booking-link:hover { text-decoration: underline; }
+    .review-visibility-row { display: flex; align-items: center; gap: var(--spacing-2); }
+    .review-vis-label { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+
+    /* visibility toggle */
+    .vis-toggle { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+    .vis-toggle input { display: none; }
+    .vis-track {
+      width: 38px; height: 22px;
+      border-radius: var(--radius-full);
+      background: var(--color-border-dark);
+      transition: background var(--transition-fast);
+      position: relative;
+    }
+    .vis-track::before {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      top: 3px; left: 3px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+      transition: transform var(--transition-fast);
+    }
+    .vis-toggle input:checked + .vis-track { background: var(--color-success); }
+    .vis-toggle input:checked + .vis-track::before { transform: translateX(16px); }
+
+    /* empty / loading */
+    .empty-state { text-align: center; padding: var(--spacing-16) var(--spacing-4); }
+    .empty-state-icon  { font-size: 3rem; margin-bottom: var(--spacing-4); }
+    .empty-state-title { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-2); }
+    .empty-state-desc  { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+
+    .skel-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-3);
+      animation: pulse 1.5s infinite;
+    }
+    .skel-line { height: .8rem; border-radius: var(--radius-sm); background: var(--color-border); }
+  </style>
+</head>
+<body>
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/landing.html" class="navbar-brand">⚡ Tekpair</a>
+      <div class="navbar-links">
+        <a href="/admin/dashboard.html"  class="navbar-link">Dashboard</a>
+        <a href="/admin/providers.html"  class="navbar-link">Providers</a>
+        <a href="/admin/categories.html" class="navbar-link">Categories</a>
+        <a href="/admin/bookings.html"   class="navbar-link">Bookings</a>
+        <a href="/admin/reviews.html"    class="navbar-link active">Reviews</a>
+      </div>
+      <div class="navbar-actions">
+        <span data-auth="guest" style="display:none;">
+          <a href="/index.html" class="btn btn-primary btn-sm">Sign In</a>
+        </span>
+        <span data-auth="user" style="display:none;" class="navbar-actions">
+          <img data-user-avatar class="navbar-avatar" src="" alt="" style="display:none;" />
+          <span data-user-name class="navbar-user-name" style="font-size:var(--font-size-sm);font-weight:500;"></span>
+          <button onclick="logout()" class="btn btn-outline btn-sm">Sign Out</button>
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <main class="container">
+
+    <div class="page-header">
+      <h1>Review Moderation</h1>
+      <p>Manage the visibility of customer reviews across the platform</p>
+    </div>
+
+    <!-- Summary stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-label">Total Reviews</div>
+        <div class="stat-card-value" id="stat-total"><span class="skel-val"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Avg Rating</div>
+        <div class="stat-card-value" id="stat-avg"><span class="skel-val"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Hidden</div>
+        <div class="stat-card-value" id="stat-hidden"><span class="skel-val"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">5-Star Reviews</div>
+        <div class="stat-card-value" id="stat-fivestar"><span class="skel-val"></span></div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <!-- Visibility filters -->
+      <div class="filter-group">
+        <button class="filter-btn active" data-vis="all"     onclick="setVisFilter('all')">All</button>
+        <button class="filter-btn"        data-vis="visible" onclick="setVisFilter('visible')">👁 Visible</button>
+        <button class="filter-btn"        data-vis="hidden"  onclick="setVisFilter('hidden')">🚫 Hidden</button>
+      </div>
+
+      <!-- Star filters -->
+      <div class="filter-group" id="star-filters">
+        <button class="star-filter-btn active" data-star="0" onclick="setStarFilter(0)">All ★</button>
+        <button class="star-filter-btn" data-star="5" onclick="setStarFilter(5)">5 ★</button>
+        <button class="star-filter-btn" data-star="4" onclick="setStarFilter(4)">4 ★</button>
+        <button class="star-filter-btn" data-star="3" onclick="setStarFilter(3)">3 ★</button>
+        <button class="star-filter-btn" data-star="2" onclick="setStarFilter(2)">2 ★</button>
+        <button class="star-filter-btn" data-star="1" onclick="setStarFilter(1)">1 ★</button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <span class="search-wrap-icon">🔍</span>
+        <input type="search" id="review-search" placeholder="Search provider or customer…" oninput="handleSearch(this.value)" />
+      </div>
+    </div>
+
+    <!-- Reviews list -->
+    <div id="reviews-skeleton" class="reviews-list">
+      <div class="skel-card"><div class="skel-line" style="width:40%;"></div><div class="skel-line" style="width:90%;"></div><div class="skel-line" style="width:75%;"></div></div>
+      <div class="skel-card"><div class="skel-line" style="width:35%;"></div><div class="skel-line" style="width:85%;"></div><div class="skel-line" style="width:65%;"></div></div>
+      <div class="skel-card"><div class="skel-line" style="width:45%;"></div><div class="skel-line" style="width:80%;"></div><div class="skel-line" style="width:70%;"></div></div>
+    </div>
+    <div id="reviews-list" class="reviews-list" style="display:none;"></div>
+
+  </main>
+
+  <!-- ── Scripts ────────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/pages/admin-reviews.js"></script>
+</body>
+</html>

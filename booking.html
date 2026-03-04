@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a Service — Tekpair</title>
+
+  <link rel="icon" type="image/png" href="assets/Tekpair.png">
+  <meta name="description" content="Book a verified local professional for your next home service on Tekpair.">
+  <meta property="og:title" content="Book a Service — Tekpair">
+  <meta property="og:description" content="Schedule a trusted local professional for home repair, cleaning, and more.">
+  <meta property="og:image" content="/og-image.png">
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Layout ───────────────────────────────────────── */
+    .booking-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: var(--spacing-8);
+      align-items: start;
+      padding-block: var(--spacing-8);
+    }
+    @media (max-width: 900px) {
+      .booking-layout { grid-template-columns: 1fr; }
+      .booking-sidebar { order: -1; }
+    }
+
+    /* ── Page header ──────────────────────────────────── */
+    .page-header {
+      margin-bottom: var(--spacing-6);
+    }
+    .page-header h1 {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--spacing-1);
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .breadcrumb a { color: var(--color-primary); }
+    .breadcrumb-sep { color: var(--color-border-dark); }
+
+    /* ── Step indicator ───────────────────────────────── */
+    .steps-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: var(--spacing-6);
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      flex: 1;
+      position: relative;
+    }
+    .step-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: calc(20px + var(--spacing-2));
+      right: 0;
+      top: 50%;
+      height: 2px;
+      background: var(--color-border);
+      z-index: 0;
+    }
+    .step-item.done:not(:last-child)::after,
+    .step-item.active:not(:last-child)::after { background: var(--color-primary-light); }
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border-dark);
+      background: var(--color-surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+      z-index: 1;
+      transition: all var(--transition-base);
+    }
+    .step-item.done  .step-dot { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+    .step-item.active .step-dot { border-color: var(--color-primary); color: var(--color-primary); box-shadow: 0 0 0 4px var(--color-primary-light); }
+    .step-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+    .step-item.active .step-label { color: var(--color-primary); font-weight: var(--font-weight-semibold); }
+    .step-item.done  .step-label { color: var(--color-text); }
+    @media (max-width: 480px) { .step-label { display: none; } }
+
+    /* ── Form card ────────────────────────────────────── */
+    .form-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .form-section {
+      padding: var(--spacing-6);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .form-section:last-child { border-bottom: none; }
+    .form-section-title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--spacing-4);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+    }
+    .form-section-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #fff;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Time slot buttons ────────────────────────────── */
+    .time-slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-2);
+    }
+    .time-slot-btn {
+      padding: var(--spacing-2) var(--spacing-4);
+      border: 1.5px solid var(--color-border-dark);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-family);
+    }
+    .time-slot-btn:hover { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-50); }
+    .time-slot-btn.selected { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+    .time-slot-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Image upload area ────────────────────────────── */
+    .upload-area {
+      border: 2px dashed var(--color-border-dark);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-6);
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    }
+    .upload-area:hover, .upload-area.drag-over {
+      border-color: var(--color-primary);
+      background: var(--color-primary-50);
+    }
+    .upload-area input[type="file"] { display: none; }
+    .upload-icon { font-size: 2.5rem; margin-bottom: var(--spacing-2); }
+    .upload-text { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+    .upload-hint { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--spacing-1); }
+
+    .image-previews {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-3);
+      margin-top: var(--spacing-4);
+    }
+    .preview-item {
+      position: relative;
+      width: 88px; height: 88px;
+      border-radius: var(--radius-lg);
+      overflow: visible;
+    }
+    .preview-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+    }
+    .preview-remove {
+      position: absolute;
+      top: -8px; right: -8px;
+      width: 22px; height: 22px;
+      background: var(--color-danger);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--shadow-sm);
+      transition: background var(--transition-fast);
+    }
+    .preview-remove:hover { background: #991b1b; }
+
+    /* ── Price estimate card ──────────────────────────── */
+    .price-estimate {
+      background: var(--color-primary-50);
+      border: 1px solid var(--color-primary-light);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-4) var(--spacing-5);
+    }
+    .price-estimate-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: var(--font-size-sm);
+      padding-block: var(--spacing-2);
+    }
+    .price-estimate-row:not(:last-child) { border-bottom: 1px solid var(--color-primary-light); }
+    .price-estimate-total {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+    }
+    .price-disclaimer {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--spacing-2);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-1);
+    }
+
+    /* ── Provider summary card ────────────────────────── */
+    .provider-summary-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      position: sticky;
+      top: calc(var(--nav-height) + var(--spacing-4));
+    }
+    .provider-summary-header {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      padding: var(--spacing-5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-3);
+      text-align: center;
+    }
+    .provider-summary-name {
+      color: #fff;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+    }
+    .provider-summary-badges {
+      display: flex;
+      gap: var(--spacing-2);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .provider-summary-body { padding: var(--spacing-5); }
+    .summary-detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      font-size: var(--font-size-sm);
+    }
+    .summary-detail-row:last-child { border-bottom: none; }
+    .summary-detail-label { color: var(--color-text-muted); font-size: var(--font-size-xs); text-transform: uppercase; letter-spacing: 0.05em; }
+    .summary-detail-value { font-weight: var(--font-weight-medium); color: var(--color-text); }
+    .avail-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); display: inline-block; margin-right: 4px; animation: pulse-dot 1.5s ease-in-out infinite; }
+
+    /* Provider card skeleton */
+    .provider-summary-skeleton .provider-summary-header {
+      background: var(--color-border);
+      min-height: 140px;
+    }
+
+    /* ── Confirm modal extras ─────────────────────────── */
+    .confirm-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--spacing-4);
+      padding-block: var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      font-size: var(--font-size-sm);
+    }
+    .confirm-summary-row:last-child { border-bottom: none; }
+    .confirm-summary-label { color: var(--color-text-muted); flex-shrink: 0; min-width: 110px; }
+    .confirm-summary-value { font-weight: var(--font-weight-medium); text-align: right; }
+
+    /* ── Upload progress ──────────────────────────────── */
+    .upload-progress {
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-3) var(--spacing-4);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      margin-top: var(--spacing-3);
+    }
+    .progress-bar-outer {
+      flex: 1;
+      height: 6px;
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: var(--radius-full);
+      transition: width var(--transition-base);
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/landing.html" class="nav-brand">🔧 Tek<span style="color:var(--color-primary)">pair</span></a>
+    <div class="nav-links">
+      <a href="/landing.html" class="nav-link">Home</a>
+      <a href="/bookings.html" class="nav-link">My Bookings</a>
+      <div data-auth="user" style="display:none;" class="nav-dropdown" id="user-menu">
+        <button style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;"
+          onclick="document.getElementById('user-menu').classList.toggle('open')">
+          <img data-user-avatar src="" alt="avatar" class="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+          <span data-user-name class="text-sm font-medium hide-mobile"></span>
+          <span style="font-size:0.6rem;color:var(--color-text-muted);">▼</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/profile.html" class="nav-dropdown-item">👤 My Profile</a>
+          <div class="nav-dropdown-divider"></div>
+          <button class="nav-dropdown-item danger" onclick="logout()">🚪 Sign Out</button>
+        </div>
+      </div>
+      <a data-auth="guest" href="/index.html" class="btn btn-primary btn-sm">Sign In</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main>
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="page-header" style="padding-top:var(--spacing-6);">
+      <div class="breadcrumb">
+        <a href="/landing.html">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="/landing.html#providers-section">Providers</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>New Booking</span>
+      </div>
+      <h1 style="margin-top:var(--spacing-3);">Create a Booking</h1>
+    </div>
+
+    <!-- Steps bar -->
+    <div class="steps-bar">
+      <div class="step-item active" id="step-1-item">
+        <div class="step-dot">1</div>
+        <span class="step-label">Address</span>
+      </div>
+      <div class="step-item" id="step-2-item">
+        <div class="step-dot">2</div>
+        <span class="step-label">Schedule</span>
+      </div>
+      <div class="step-item" id="step-3-item">
+        <div class="step-dot">3</div>
+        <span class="step-label">Details</span>
+      </div>
+      <div class="step-item" id="step-4-item">
+        <div class="step-dot">4</div>
+        <span class="step-label">Confirm</span>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="booking-layout">
+
+      <!-- ── LEFT: FORM ──────────────────────────────── -->
+      <div>
+        <form id="booking-form" novalidate>
+
+          <!-- Section 1: Address -->
+          <div class="form-card mb-6" id="form-section-address" style="margin-bottom:var(--spacing-4);">
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="form-section-num">1</span>
+                Service Address
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="address-street">Street Address <span class="required">*</span></label>
+                <input class="form-input" type="text" id="address-street" placeholder="123 MG Road, Near Apollo Hospital" required />
+                <span class="form-error" id="address-street-error"></span>
+              </div>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" for="address-city">City <span class="required">*</span></label>
+                  <input class="form-input" type="text" id="address-city" placeholder="Mumbai" required />
+                  <span class="form-error" id="address-city-error"></span>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" for="address-area">Area / Locality <span class="required">*</span></label>
+                  <input class="form-input" type="text" id="address-area" placeholder="Andheri West" required />
+                  <span class="form-error" id="address-area-error"></span>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:var(--spacing-4);">
+                <label class="form-label" for="address-pincode">Pincode <span class="required">*</span></label>
+                <input class="form-input" type="text" id="address-pincode" placeholder="400053" maxlength="6" style="max-width:180px;" required />
+                <span class="form-error" id="address-pincode-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Schedule -->
+          <div class="form-card mb-6" style="margin-bottom:var(--spacing-4);">
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="form-section-num">2</span>
+                Schedule
+              </div>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" for="schedule-date">Preferred Date <span class="required">*</span></label>
+                  <input class="form-input" type="date" id="schedule-date" required />
+                  <span class="form-error" id="schedule-date-error"></span>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Preferred Time <span class="required">*</span></label>
+                  <div class="time-slots" id="time-slots">
+                    <button type="button" class="time-slot-btn" data-time="09:00" onclick="selectTime(this)">9:00 AM</button>
+                    <button type="button" class="time-slot-btn" data-time="11:00" onclick="selectTime(this)">11:00 AM</button>
+                    <button type="button" class="time-slot-btn" data-time="13:00" onclick="selectTime(this)">1:00 PM</button>
+                    <button type="button" class="time-slot-btn" data-time="15:00" onclick="selectTime(this)">3:00 PM</button>
+                    <button type="button" class="time-slot-btn" data-time="17:00" onclick="selectTime(this)">5:00 PM</button>
+                    <button type="button" class="time-slot-btn" data-time="19:00" onclick="selectTime(this)">7:00 PM</button>
+                  </div>
+                  <span class="form-error" id="schedule-time-error"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Job Details -->
+          <div class="form-card" style="margin-bottom:var(--spacing-4);">
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="form-section-num">3</span>
+                Job Details
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="job-notes">Description</label>
+                <textarea
+                  class="form-textarea"
+                  id="job-notes"
+                  rows="4"
+                  placeholder="Describe what needs to be done — e.g. 'Kitchen sink is leaking near the P-trap, needs replacing.'"
+                  style="min-height:100px;"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Photos (optional, max 3)</label>
+                <div
+                  class="upload-area"
+                  id="upload-area"
+                  onclick="document.getElementById('image-input').click()"
+                  ondragover="handleDragOver(event)"
+                  ondragleave="handleDragLeave(event)"
+                  ondrop="handleDrop(event)"
+                >
+                  <input
+                    type="file"
+                    id="image-input"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    onchange="handleImageSelect(event)"
+                  />
+                  <div class="upload-icon">📷</div>
+                  <div class="upload-text">Click or drag &amp; drop images here</div>
+                  <div class="upload-hint">JPG, PNG or WebP · max 5 MB each · up to 3 images</div>
+                </div>
+                <div class="image-previews" id="image-previews"></div>
+                <span class="form-error" id="image-error"></span>
+              </div>
+            </div>
+
+            <!-- Section 4: Price estimate -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="form-section-num">4</span>
+                Price Estimate
+              </div>
+              <div class="price-estimate" id="price-estimate-box">
+                <div class="price-estimate-row">
+                  <span>Base service fee</span>
+                  <span id="est-base">—</span>
+                </div>
+                <div class="price-estimate-row">
+                  <span>Platform fee</span>
+                  <span>₹0</span>
+                </div>
+                <div class="price-estimate-row" style="font-weight:var(--font-weight-semibold);">
+                  <span>Estimated Total</span>
+                  <span class="price-estimate-total" id="est-total">—</span>
+                </div>
+              </div>
+              <p class="price-disclaimer">
+                <span>ℹ️</span>
+                Final price will be confirmed by the provider after reviewing your job details.
+              </p>
+            </div>
+          </div>
+
+          <!-- Submit button -->
+          <div class="flex justify-end gap-3">
+            <a href="/landing.html" class="btn btn-secondary">Cancel</a>
+            <button type="button" class="btn btn-primary btn-lg" onclick="openConfirmModal()">
+              Review &amp; Confirm →
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ── RIGHT: PROVIDER SUMMARY ─────────────────── -->
+      <aside class="booking-sidebar">
+        <!-- Skeleton shown while loading -->
+        <div class="provider-summary-card provider-summary-skeleton" id="provider-card-skeleton">
+          <div class="provider-summary-header">
+            <div class="skeleton skeleton-avatar" style="width:72px;height:72px;border-radius:50%;"></div>
+            <div class="skeleton skeleton-text" style="width:120px;height:16px;"></div>
+          </div>
+          <div class="provider-summary-body">
+            <div class="skeleton skeleton-text mb-2"></div>
+            <div class="skeleton skeleton-text" style="width:70%;"></div>
+            <div class="skeleton skeleton-text mt-4"></div>
+          </div>
+        </div>
+
+        <!-- Populated by JS -->
+        <div class="provider-summary-card" id="provider-card" style="display:none;">
+          <div class="provider-summary-header">
+            <div id="provider-avatar-wrap"></div>
+            <div class="provider-summary-name" id="provider-display-name"></div>
+            <div class="provider-summary-badges">
+              <span class="badge badge-confirmed">✓ Verified</span>
+              <span id="provider-avail-badge"></span>
+            </div>
+          </div>
+          <div class="provider-summary-body">
+            <div class="summary-detail-row">
+              <div>
+                <div class="summary-detail-label">Category</div>
+                <div class="summary-detail-value" id="provider-category-display">—</div>
+              </div>
+            </div>
+            <div class="summary-detail-row">
+              <div>
+                <div class="summary-detail-label">Rating</div>
+                <div class="summary-detail-value" id="provider-rating-display">—</div>
+              </div>
+            </div>
+            <div class="summary-detail-row">
+              <div>
+                <div class="summary-detail-label">Base Price</div>
+                <div class="summary-detail-value" id="provider-price-display">—</div>
+              </div>
+            </div>
+            <div class="summary-detail-row">
+              <div>
+                <div class="summary-detail-label">Location</div>
+                <div class="summary-detail-value" id="provider-city-display">—</div>
+              </div>
+            </div>
+            <div class="summary-detail-row">
+              <div>
+                <div class="summary-detail-label">Experience</div>
+                <div class="summary-detail-value" id="provider-exp-display">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Provider not found -->
+        <div class="card" id="provider-error-card" style="display:none;">
+          <div class="card-body">
+            <div class="empty-state" style="padding:var(--spacing-8) var(--spacing-4);">
+              <div class="empty-state-icon">😕</div>
+              <div class="empty-state-title">Provider not found</div>
+              <p class="empty-state-desc">The provider you selected is unavailable.</p>
+              <a href="/landing.html" class="btn btn-outline btn-sm mt-4">Back to Browse</a>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- ══ CONFIRM MODAL ════════════════════════════════════════ -->
+<div class="modal" id="confirm-modal">
+  <div class="modal-overlay" onclick="closeConfirmModal()"></div>
+  <div class="modal-content" style="max-width:540px;">
+    <div class="modal-header">
+      <h3>Review Your Booking</h3>
+      <button class="modal-close" onclick="closeConfirmModal()">×</button>
+    </div>
+    <div class="modal-body" style="max-height:65vh;overflow-y:auto;">
+
+      <!-- Provider info at top of modal -->
+      <div style="display:flex;align-items:center;gap:var(--spacing-3);padding:var(--spacing-4);background:var(--color-primary-50);border-radius:var(--radius-lg);margin-bottom:var(--spacing-4);">
+        <div id="modal-provider-avatar"></div>
+        <div>
+          <div style="font-weight:var(--font-weight-semibold);color:var(--color-text);" id="modal-provider-name">—</div>
+          <div style="font-size:var(--font-size-xs);color:var(--color-text-muted);" id="modal-provider-category">—</div>
+        </div>
+      </div>
+
+      <div id="confirm-summary-rows"></div>
+
+      <!-- Upload progress -->
+      <div class="upload-progress" id="upload-progress" style="display:none;">
+        <span>⬆ Uploading images…</span>
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner" id="upload-progress-bar" style="width:0%"></div>
+        </div>
+        <span id="upload-progress-text">0%</span>
+      </div>
+
+      <div class="alert alert-warning mt-4" id="confirm-warning" style="display:none;">
+        <span class="alert-icon">⚠</span>
+        <div class="alert-body" id="confirm-warning-msg"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeConfirmModal()">Edit Details</button>
+      <button class="btn btn-primary" id="confirm-btn" onclick="submitBooking()">
+        ✓ Confirm Booking
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/pages/booking.js"></script>
+
+</body>
+</html>

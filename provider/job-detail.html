@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Detail — Tekpair Provider</title>
+
+  <link rel="icon" type="image/png" href="../assets/Tekpair.png">
+  <meta name="description" content="Manage your job — update status, add notes, and upload before/after photos.">
+  <meta name="robots" content="noindex">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Two-column layout ────────────────────────────── */
+    .job-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: var(--spacing-6);
+      align-items: start;
+      padding-block: var(--spacing-8);
+    }
+    @media (max-width: 900px) {
+      .job-layout { grid-template-columns: 1fr; }
+      .job-sidebar { order: -1; }
+    }
+
+    /* ── Breadcrumb ───────────────────────────────────── */
+    .breadcrumb {
+      display: flex; align-items: center;
+      gap: var(--spacing-2);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--spacing-6);
+    }
+    .breadcrumb a { color: var(--color-primary); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb-sep { color: var(--color-border-dark); }
+
+    /* ── Sticky action bar ────────────────────────────── */
+    .job-action-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-4) var(--spacing-5);
+      margin-bottom: var(--spacing-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-4);
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+    }
+    .action-bar-left {
+      display: flex; align-items: center; gap: var(--spacing-3);
+    }
+    .action-bar-title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+    }
+    .action-bar-btns {
+      display: flex; gap: var(--spacing-2); flex-wrap: wrap;
+    }
+
+    /* ── Job header card ──────────────────────────────── */
+    .job-header {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5) var(--spacing-6);
+      margin-bottom: var(--spacing-4);
+    }
+    .job-header-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap;
+    }
+    .job-booking-id {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-1);
+    }
+    .job-booking-meta {
+      display: flex; align-items: center; gap: var(--spacing-3); flex-wrap: wrap;
+      margin-top: var(--spacing-2);
+    }
+    .job-booking-date {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Cards ────────────────────────────────────────── */
+    .job-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5) var(--spacing-6);
+      margin-bottom: var(--spacing-4);
+    }
+    .job-card-title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-4);
+      display: flex; align-items: center; gap: var(--spacing-2);
+    }
+
+    /* ── Field grid ───────────────────────────────────── */
+    .job-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-4);
+    }
+    @media (max-width: 600px) {
+      .job-grid-2 { grid-template-columns: 1fr; }
+    }
+    .job-field-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--spacing-1);
+    }
+    .job-field-value {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      font-weight: var(--font-weight-medium);
+    }
+
+    /* ── Customer info highlight row ──────────────────── */
+    .customer-highlight {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-4);
+      padding: var(--spacing-4);
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-5);
+      flex-wrap: wrap;
+    }
+    .customer-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--color-primary-light);
+      flex-shrink: 0;
+    }
+    .customer-highlight-info { flex: 1; min-width: 0; }
+    .customer-highlight-name {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+    }
+    .customer-highlight-phone, .customer-highlight-email {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-top: 2px;
+    }
+    .customer-highlight-actions { display: flex; gap: var(--spacing-2); flex-shrink: 0; }
+
+    /* ── Inline notes ─────────────────────────────────── */
+    .notes-save-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--spacing-3);
+      gap: var(--spacing-3);
+    }
+    .notes-save-bar .notes-hint {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Final price row ──────────────────────────────── */
+    .price-final-row {
+      display: flex; align-items: center; gap: var(--spacing-3);
+      margin-top: var(--spacing-3); flex-wrap: wrap;
+    }
+    .price-final-row .form-input {
+      max-width: 160px;
+    }
+
+    /* ── Inline image upload ──────────────────────────── */
+    .photo-section-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-2);
+    }
+    .file-drop-zone {
+      border: 2px dashed var(--color-border-dark);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-4);
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+    .file-drop-zone:hover, .file-drop-zone.dragover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-50);
+    }
+    .file-drop-zone input[type="file"] { display: none; }
+    .photo-thumbs {
+      display: flex; flex-wrap: wrap; gap: var(--spacing-2);
+      margin-top: var(--spacing-3);
+    }
+    .photo-thumb-wrap {
+      position: relative;
+      width: 80px; height: 80px;
+    }
+    .photo-thumb {
+      width: 80px; height: 80px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--color-border);
+      cursor: pointer;
+    }
+    .photo-thumb-remove {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: bold;
+      line-height: 20px;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .photo-upload-btn {
+      margin-top: var(--spacing-3);
+    }
+
+    /* ── Timeline ─────────────────────────────────────── */
+    .timeline-wrap {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5) var(--spacing-6);
+      margin-bottom: var(--spacing-4);
+    }
+
+    /* ── Sidebar ──────────────────────────────────────── */
+    .sidebar-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-4);
+    }
+    .sidebar-card-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-4);
+    }
+    .sidebar-action-btn {
+      width: 100%;
+      margin-bottom: var(--spacing-2);
+    }
+    .sidebar-action-btn:last-child { margin-bottom: 0; }
+
+    /* ── History log ──────────────────────────────────── */
+    .history-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-3);
+      padding: var(--spacing-2) 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: var(--font-size-sm);
+    }
+    .history-entry:last-child { border-bottom: none; }
+    .history-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--color-primary); flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .history-text { color: var(--color-text-secondary); }
+    .history-time { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
+
+    /* ── Reschedule banner ────────────────────────────── */
+    .reschedule-card {
+      border: 1.5px solid #FBBF24;
+      background: #FFFBEB;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-4) var(--spacing-5);
+      margin-bottom: var(--spacing-4);
+    }
+    .reschedule-card-header {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--spacing-2);
+      color: #92400E;
+    }
+    .reschedule-actions { display: flex; gap: var(--spacing-2); margin-top: var(--spacing-3); }
+
+    /* ── Lightbox ─────────────────────────────────────── */
+    #lightbox {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.9);
+      align-items: center; justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 90vw; max-height: 85vh; border-radius: var(--radius-lg); }
+    #lightbox-close {
+      position: fixed; top: 16px; right: 20px;
+      background: rgba(255,255,255,0.15); border: none; color: #fff;
+      font-size: 1.8rem; width: 44px; height: 44px;
+      border-radius: 50%; cursor: pointer; line-height: 44px; text-align: center;
+    }
+    #lightbox-close:hover { background: rgba(255,255,255,0.3); }
+
+    /* ── Image gallery ────────────────────────────────── */
+    .image-gallery {
+      display: flex; flex-wrap: wrap; gap: var(--spacing-2);
+    }
+    .gallery-img {
+      width: 80px; height: 80px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--color-border);
+      cursor: pointer;
+      transition: border-color var(--transition-fast);
+    }
+    .gallery-img:hover { border-color: var(--color-primary); }
+
+    /* ── Pricing ──────────────────────────────────────── */
+    .price-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: var(--spacing-2) 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: var(--font-size-sm);
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row-label { color: var(--color-text-secondary); }
+    .price-row-value { font-weight: var(--font-weight-semibold); color: var(--color-text); }
+    .price-row.total .price-row-label { font-weight: var(--font-weight-bold); font-size: var(--font-size-base); color: var(--color-text); }
+    .price-row.total .price-row-value { font-size: var(--font-size-base); color: var(--color-primary); }
+
+    /* ── Denied / Error states ────────────────────────── */
+    .denied-state {
+      text-align: center; padding: var(--spacing-16) var(--spacing-4);
+    }
+    .denied-state-icon { font-size: 4rem; margin-bottom: var(--spacing-4); }
+    .denied-state-title { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-2); }
+    .denied-state-desc { color: var(--color-text-secondary); margin-bottom: var(--spacing-6); }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/landing.html" class="nav-brand">🔧 Tek<span style="color:var(--color-primary)">pair</span></a>
+    <div class="nav-links">
+      <a href="/provider/dashboard.html" class="nav-link">Dashboard</a>
+      <div data-auth="user" style="display:none;" class="nav-dropdown" id="user-menu">
+        <button style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;"
+          onclick="document.getElementById('user-menu').classList.toggle('open')">
+          <img data-user-avatar src="" alt="avatar" class="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+          <span data-user-name class="text-sm font-medium hide-mobile"></span>
+          <span style="font-size:0.6rem;color:var(--color-text-muted);">▼</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/provider/profile.html" class="nav-dropdown-item">⚙️ My Profile</a>
+          <div class="nav-dropdown-divider"></div>
+          <button class="nav-dropdown-item danger" onclick="logout()">🚪 Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main>
+  <div class="container" style="max-width:1100px;">
+
+    <!-- ── Skeleton ──────────────────────────────────── -->
+    <div id="page-skeleton" style="padding-top:var(--spacing-8);">
+      <div class="skeleton skeleton-text" style="width:200px;margin-bottom:var(--spacing-5);"></div>
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-5);margin-bottom:var(--spacing-4);">
+        <div class="skeleton skeleton-text" style="width:55%;margin-bottom:var(--spacing-3);"></div>
+        <div class="skeleton skeleton-text" style="width:35%;"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-5);">
+            <div class="skeleton skeleton-text" style="width:120px;margin-bottom:var(--spacing-4);"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text" style="width:70%;"></div>
+          </div>
+          <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-5);">
+            <div class="skeleton skeleton-text" style="width:140px;margin-bottom:var(--spacing-4);"></div>
+            <div class="skeleton skeleton-text"></div>
+          </div>
+        </div>
+        <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--spacing-5);">
+          <div class="skeleton skeleton-text" style="width:80%;margin-bottom:var(--spacing-3);"></div>
+          <div class="skeleton skeleton-text" style="height:36px;margin-bottom:var(--spacing-2);border-radius:8px;"></div>
+          <div class="skeleton skeleton-text" style="height:36px;border-radius:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Error / denied ────────────────────────────── -->
+    <div id="page-error" style="display:none;">
+      <div class="denied-state">
+        <div class="denied-state-icon">🔒</div>
+        <div class="denied-state-title" id="err-title">Access Denied</div>
+        <p class="denied-state-desc" id="err-desc">You don't have permission to view this job.</p>
+        <a href="/provider/dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- ── Page content ───────────────────────────────── -->
+    <div id="page-content" style="display:none;">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a href="/provider/dashboard.html">Dashboard</a>
+        <span class="breadcrumb-sep">›</span>
+        <span id="bc-booking-id">Job</span>
+      </nav>
+
+      <!-- Reschedule request banner -->
+      <div class="reschedule-card" id="reschedule-banner" style="display:none;">
+        <div class="reschedule-card-header">⏳ Customer Requested Reschedule</div>
+        <div style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">
+          Proposed new time: <strong id="reschedule-proposed-time"></strong>
+        </div>
+        <div class="reschedule-actions">
+          <button class="btn btn-success btn-sm" onclick="respondReschedule('accepted')">✓ Accept</button>
+          <button class="btn btn-danger btn-sm"  onclick="respondReschedule('rejected')">✕ Decline</button>
+        </div>
+      </div>
+
+      <!-- Sticky action bar -->
+      <div class="job-action-bar" id="action-bar">
+        <div class="action-bar-left">
+          <span id="action-bar-status"></span>
+          <span class="action-bar-title" id="action-bar-title">Loading…</span>
+        </div>
+        <div class="action-bar-btns" id="action-bar-btns">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="job-layout">
+
+        <!-- ════ LEFT COLUMN ════════════════════════════ -->
+        <div class="job-main">
+
+          <!-- 1. Booking header -->
+          <div class="job-header">
+            <div class="job-header-top">
+              <div>
+                <div class="job-booking-id" id="hdr-booking-id">Job #—</div>
+                <div class="job-booking-meta">
+                  <span id="hdr-status-badge"></span>
+                  <span class="job-booking-date" id="hdr-created-date"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Customer Info (always shown to provider) -->
+          <div class="job-card">
+            <div class="job-card-title">👤 Customer Information</div>
+
+            <div class="customer-highlight">
+              <img id="cust-avatar" class="customer-avatar" src="" alt="Customer" />
+              <div class="customer-highlight-info">
+                <div class="customer-highlight-name" id="cust-name">—</div>
+                <div class="customer-highlight-phone" id="cust-phone">—</div>
+                <div class="customer-highlight-email" id="cust-email">—</div>
+              </div>
+              <div class="customer-highlight-actions">
+                <a id="cust-call-btn" href="#" class="btn btn-outline btn-sm">📞 Call</a>
+              </div>
+            </div>
+
+            <div class="job-grid-2">
+              <div style="grid-column:1/-1;">
+                <div class="job-field-label">Full Address</div>
+                <div class="job-field-value" id="cust-address">—</div>
+              </div>
+              <div>
+                <div class="job-field-label">Scheduled Time</div>
+                <div class="job-field-value" id="svc-scheduled">—</div>
+              </div>
+              <div>
+                <div class="job-field-label">Duration</div>
+                <div class="job-field-value" id="svc-duration">—</div>
+              </div>
+              <div>
+                <div class="job-field-label">Category</div>
+                <div class="job-field-value" id="svc-category">—</div>
+              </div>
+              <div>
+                <div class="job-field-label">Booked On</div>
+                <div class="job-field-value" id="svc-booked-on">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Customer Notes & Images -->
+          <div class="job-card" id="cust-notes-card">
+            <div class="job-card-title">💬 Customer Notes &amp; Images</div>
+            <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);margin-bottom:var(--spacing-3);" id="cust-notes"></p>
+            <div class="image-gallery" id="cust-images"></div>
+          </div>
+
+          <!-- 4. Provider Notes (inline editable) -->
+          <div class="job-card">
+            <div class="job-card-title">📝 Your Notes</div>
+            <textarea class="form-textarea" id="notes-input" rows="4"
+              placeholder="Add notes about this job — visible to the customer after completion…"></textarea>
+            <div class="notes-save-bar">
+              <span class="notes-hint" id="notes-saved-hint" style="color:var(--color-success,#10B981);display:none;">✓ Saved</span>
+              <span class="notes-hint">Notes are saved manually — customer sees them.</span>
+              <button class="btn btn-secondary btn-sm" id="notes-save-btn" onclick="saveNotes()">Save Notes</button>
+            </div>
+          </div>
+
+          <!-- 5. Before / After Photos (inline upload, only visible when in-progress/completed) -->
+          <div class="job-card" id="photos-card">
+            <div class="job-card-title">📷 Before &amp; After Photos</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-4);">
+              <!-- Before -->
+              <div>
+                <div class="photo-section-title">Before</div>
+                <div class="file-drop-zone" id="before-drop"
+                     onclick="document.getElementById('before-file').click()"
+                     ondragover="handleDragOver(event,'before-drop')"
+                     ondragleave="handleDragLeave(event,'before-drop')"
+                     ondrop="handleDrop(event,'before')">
+                  <input type="file" id="before-file" multiple accept="image/*"
+                         onchange="handleFileSelect(event,'before')" />
+                  <div style="font-size:1.5rem;margin-bottom:4px;">📷</div>
+                  <div style="font-size:var(--font-size-xs);color:var(--color-text-muted);">Click or drag (max 3)</div>
+                </div>
+                <div class="photo-thumbs" id="before-thumbs"></div>
+              </div>
+              <!-- After -->
+              <div>
+                <div class="photo-section-title">After</div>
+                <div class="file-drop-zone" id="after-drop"
+                     onclick="document.getElementById('after-file').click()"
+                     ondragover="handleDragOver(event,'after-drop')"
+                     ondragleave="handleDragLeave(event,'after-drop')"
+                     ondrop="handleDrop(event,'after')">
+                  <input type="file" id="after-file" multiple accept="image/*"
+                         onchange="handleFileSelect(event,'after')" />
+                  <div style="font-size:1.5rem;margin-bottom:4px;">🏠</div>
+                  <div style="font-size:var(--font-size-xs);color:var(--color-text-muted);">Click or drag (max 3)</div>
+                </div>
+                <div class="photo-thumbs" id="after-thumbs"></div>
+              </div>
+            </div>
+
+            <!-- Upload progress bar -->
+            <div id="photo-upload-progress" style="display:none;margin-top:var(--spacing-3);">
+              <div style="font-size:var(--font-size-xs);color:var(--color-text-muted);margin-bottom:6px;">Uploading…</div>
+              <div style="background:var(--color-border);border-radius:var(--radius-full);height:5px;overflow:hidden;">
+                <div id="photo-progress-bar" style="height:100%;background:var(--color-primary);transition:width 0.3s;width:0%;"></div>
+              </div>
+            </div>
+
+            <div style="margin-top:var(--spacing-4);display:flex;gap:var(--spacing-2);justify-content:flex-end;">
+              <button class="btn btn-secondary btn-sm" id="photos-save-btn" onclick="savePhotos()">💾 Save Photos</button>
+            </div>
+          </div>
+
+          <!-- 6. Pricing -->
+          <div class="job-card">
+            <div class="job-card-title">💰 Pricing</div>
+            <div id="pricing-rows"></div>
+            <div class="price-final-row" id="set-price-row" style="display:none;">
+              <label class="job-field-label" style="margin:0;">Set Final Price (₹)</label>
+              <input class="form-input" type="number" id="final-price-input"
+                     min="0" step="1" placeholder="Enter amount…" style="max-width:160px;" />
+              <button class="btn btn-secondary btn-sm" onclick="saveFinalPrice()">Update</button>
+            </div>
+          </div>
+
+          <!-- 7. Status History -->
+          <div class="job-card">
+            <div class="job-card-title">📋 Status History</div>
+            <div id="history-log">
+              <div class="skeleton skeleton-text" style="width:80%;margin-bottom:8px;"></div>
+              <div class="skeleton skeleton-text" style="width:55%;"></div>
+            </div>
+          </div>
+
+        </div>
+        <!-- ════ END LEFT COLUMN ═════════════════════════ -->
+
+        <!-- ════ RIGHT COLUMN (sidebar) ═════════════════ -->
+        <div class="job-sidebar">
+
+          <!-- Status quick-actions -->
+          <div class="sidebar-card">
+            <div class="sidebar-card-title">⚡ Quick Actions</div>
+            <div id="sidebar-actions">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Job stats -->
+          <div class="sidebar-card">
+            <div class="sidebar-card-title">📊 Job Summary</div>
+            <div style="display:flex;flex-direction:column;gap:var(--spacing-3);">
+              <div>
+                <div class="job-field-label">Status</div>
+                <div id="sidebar-status-badge" class="job-field-value"></div>
+              </div>
+              <div>
+                <div class="job-field-label">Estimated Price</div>
+                <div class="job-field-value" id="sidebar-est-price">—</div>
+              </div>
+              <div id="sidebar-final-price-row">
+                <div class="job-field-label">Final Price</div>
+                <div class="job-field-value" id="sidebar-final-price">Not set</div>
+              </div>
+              <div>
+                <div class="job-field-label">Scheduled</div>
+                <div class="job-field-value" id="sidebar-scheduled">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger zone -->
+          <div class="sidebar-card" id="reject-card" style="display:none;">
+            <div class="sidebar-card-title" style="color:#ef4444;">⚠ Danger Zone</div>
+            <button class="btn btn-danger sidebar-action-btn" onclick="openRejectModal()">✕ Reject Booking</button>
+          </div>
+
+        </div>
+        <!-- ════ END RIGHT COLUMN ════════════════════════ -->
+
+      </div>
+    </div><!-- #page-content -->
+
+  </div><!-- .container -->
+</main>
+
+<!-- ══ LIGHTBOX ══════════════════════════════════════════════ -->
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="Preview" />
+</div>
+
+<!-- ══ REJECT MODAL ══════════════════════════════════════════ -->
+<div class="modal" id="reject-modal">
+  <div class="modal-overlay" onclick="closeRejectModal()"></div>
+  <div class="modal-content" style="max-width:460px;">
+    <div class="modal-header">
+      <h3>Reject Booking</h3>
+      <button class="modal-close" onclick="closeRejectModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="reject-reason">Reason (optional)</label>
+        <textarea class="form-textarea" id="reject-reason" rows="3"
+          placeholder="Why are you unable to take this job?"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeRejectModal()">Go Back</button>
+      <button class="btn btn-danger" id="reject-confirm-btn" onclick="confirmReject()">Reject Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══════════════════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/pages/provider-job-detail.js"></script>
+
+</body>
+</html>

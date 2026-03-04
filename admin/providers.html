@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Providers — Tekpair Admin</title>
+
+  <link rel="icon" type="image/png" href="../assets/Tekpair.png">
+  <meta name="description" content="Review and manage provider verification requests on Tekpair.">
+  <meta name="robots" content="noindex">
+  <meta property="og:title" content="Manage Providers — Tekpair Admin">
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    /* ── Layout ─────────────────────────────────────────── */
+    .page-header {
+      padding-top: var(--spacing-8);
+      margin-bottom: var(--spacing-6);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--spacing-4);
+      flex-wrap: wrap;
+    }
+    .page-header-left h1 {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin: 0 0 var(--spacing-1);
+    }
+    .page-header-left p {
+      color: var(--color-text-secondary);
+      margin: 0;
+      font-size: var(--font-size-sm);
+    }
+
+    /* ── Search ─────────────────────────────────────────── */
+    .search-bar {
+      position: relative;
+      min-width: 280px;
+    }
+    .search-bar-icon {
+      position: absolute;
+      left: var(--spacing-3);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      pointer-events: none;
+      font-size: 0.95rem;
+    }
+    #provider-search {
+      width: 100%;
+      padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) var(--spacing-9);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+      background: var(--color-surface);
+      color: var(--color-text);
+      transition: border-color var(--transition-fast);
+    }
+    #provider-search:focus { outline: none; border-color: var(--color-primary); }
+
+    /* ── Tabs ───────────────────────────────────────────── */
+    .tabs-bar {
+      display: flex;
+      gap: var(--spacing-1);
+      border-bottom: 2px solid var(--color-border);
+      margin-bottom: var(--spacing-6);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: var(--spacing-3) var(--spacing-5);
+      border: none;
+      background: transparent;
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      transition: color var(--transition-fast);
+    }
+    .tab-btn:hover { color: var(--color-text); }
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+      font-weight: var(--font-weight-semibold);
+    }
+    .tab-count {
+      background: var(--color-border);
+      color: var(--color-text-secondary);
+      border-radius: var(--radius-full);
+      padding: 1px 7px;
+      font-size: 0.65rem;
+      font-weight: var(--font-weight-bold);
+    }
+    .tab-btn.active .tab-count {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    /* ── Provider cards grid ────────────────────────────── */
+    .providers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: var(--spacing-5);
+      margin-bottom: var(--spacing-12);
+    }
+    @media (max-width: 500px) { .providers-grid { grid-template-columns: 1fr; } }
+
+    .provider-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow var(--transition-base), border-color var(--transition-base);
+    }
+    .provider-card:hover { box-shadow: var(--shadow-md); }
+
+    /* Card top band (pending = orange, approved = green, rejected = red) */
+    .provider-card.pending  { border-top: 3px solid var(--color-warning); }
+    .provider-card.approved { border-top: 3px solid var(--color-success); }
+    .provider-card.rejected { border-top: 3px solid var(--color-danger); }
+
+    /* Header row */
+    .pc-head {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-3);
+      padding: var(--spacing-5) var(--spacing-5) var(--spacing-3);
+    }
+    .pc-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid var(--color-border);
+    }
+    .pc-initials {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      color: #fff;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .pc-info { flex: 1; min-width: 0; }
+    .pc-name {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pc-email {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pc-city {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+    .pc-status-badge {
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+
+    /* Meta pills */
+    .pc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-2);
+      padding: 0 var(--spacing-5) var(--spacing-3);
+    }
+    .pc-pill {
+      font-size: var(--font-size-xs);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 2px var(--spacing-3);
+      color: var(--color-text-secondary);
+    }
+
+    /* Bio */
+    .pc-bio {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      padding: 0 var(--spacing-5) var(--spacing-3);
+      line-height: 1.55;
+    }
+
+    /* Stats row (approved only) */
+    .pc-stats {
+      display: flex;
+      gap: var(--spacing-4);
+      padding: var(--spacing-2) var(--spacing-5) var(--spacing-3);
+    }
+    .pc-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .pc-stat-val {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+    }
+    .pc-stat-lbl {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    /* Portfolio thumbnails */
+    .pc-portfolio {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-1);
+      padding: 0 var(--spacing-5) var(--spacing-3);
+    }
+    .pc-portfolio-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      cursor: zoom-in;
+      border: 2px solid transparent;
+      transition: border-color var(--transition-fast), transform var(--transition-fast);
+    }
+    .pc-portfolio-thumb:hover {
+      border-color: var(--color-primary);
+      transform: scale(1.06);
+    }
+
+    /* Joined date */
+    .pc-joined {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      padding: 0 var(--spacing-5) var(--spacing-3);
+    }
+
+    /* Action footer */
+    .pc-footer {
+      margin-top: auto;
+      padding: var(--spacing-3) var(--spacing-5) var(--spacing-5);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-3);
+      flex-wrap: wrap;
+    }
+
+    /* ── Lightbox ────────────────────────────────────────── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 88vh;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+    }
+    #lightbox-close {
+      position: absolute;
+      top: var(--spacing-4);
+      right: var(--spacing-5);
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Reject modal ────────────────────────────────────── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-4);
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--color-surface);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-xl);
+      padding: var(--spacing-8);
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-5);
+    }
+    .modal-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-3);
+    }
+
+    /* ── Empty state ─────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-16) var(--spacing-4);
+      grid-column: 1 / -1;
+    }
+    .empty-state-icon  { font-size: 3rem; margin-bottom: var(--spacing-4); }
+    .empty-state-title { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-2); }
+    .empty-state-desc  { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+
+    /* ── Skeleton cards ──────────────────────────────────── */
+    .skel-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-3);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+    .skel-circle { width:52px;height:52px;border-radius:50%;background:var(--color-border); }
+    .skel-line   { height:0.8rem;border-radius:var(--radius-sm);background:var(--color-border); }
+  </style>
+</head>
+<body>
+<div id="page-loader" class="page-loader"><div class="spinner"></div></div>
+<script>window._loaderTimer=setTimeout(function(){var l=document.getElementById('page-loader');if(l){l.classList.add('loaded');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l)},600)}},2000)</script>
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/landing.html" class="navbar-brand">⚡ Tekpair</a>
+      <div class="navbar-links">
+        <a href="/admin/dashboard.html" class="navbar-link">Dashboard</a>
+        <a href="/admin/providers.html" class="navbar-link active">Providers</a>
+        <a href="/admin/categories.html" class="navbar-link">Categories</a>
+        <a href="/admin/bookings.html" class="navbar-link">Bookings</a>
+        <a href="/admin/reviews.html" class="navbar-link">Reviews</a>
+      </div>
+      <div class="navbar-actions">
+        <span data-auth="guest" style="display:none;">
+          <a href="/index.html" class="btn btn-primary btn-sm">Sign In</a>
+        </span>
+        <span data-auth="user" style="display:none;" class="navbar-actions">
+          <img data-user-avatar class="navbar-avatar" src="" alt="" style="display:none;" />
+          <span data-user-name class="navbar-user-name" style="font-size:var(--font-size-sm);font-weight:500;"></span>
+          <button onclick="logout()" class="btn btn-outline btn-sm">Sign Out</button>
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <main class="container">
+
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Manage Providers</h1>
+        <p>Review, approve, and manage service providers</p>
+      </div>
+      <div class="search-bar">
+        <span class="search-bar-icon">🔍</span>
+        <input type="search" id="provider-search" placeholder="Search by name or city…" oninput="handleSearch(this.value)" />
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="pending"  onclick="switchTab('pending')">
+        ⏳ Pending Approval <span class="tab-count" id="cnt-pending">0</span>
+      </button>
+      <button class="tab-btn" data-tab="approved" onclick="switchTab('approved')">
+        ✅ Approved <span class="tab-count" id="cnt-approved">0</span>
+      </button>
+      <button class="tab-btn" data-tab="rejected" onclick="switchTab('rejected')">
+        ❌ Rejected <span class="tab-count" id="cnt-rejected">0</span>
+      </button>
+    </div>
+
+    <!-- Loading skeletons -->
+    <div id="providers-skeleton" class="providers-grid">
+      <div class="skel-card"><div style="display:flex;gap:12px;align-items:center;"><div class="skel-circle"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;"><div class="skel-line" style="width:55%;"></div><div class="skel-line" style="width:40%;"></div></div></div><div class="skel-line" style="width:90%;"></div><div class="skel-line" style="width:70%;"></div></div>
+      <div class="skel-card"><div style="display:flex;gap:12px;align-items:center;"><div class="skel-circle"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;"><div class="skel-line" style="width:48%;"></div><div class="skel-line" style="width:36%;"></div></div></div><div class="skel-line" style="width:80%;"></div><div class="skel-line" style="width:65%;"></div></div>
+      <div class="skel-card"><div style="display:flex;gap:12px;align-items:center;"><div class="skel-circle"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;"><div class="skel-line" style="width:52%;"></div><div class="skel-line" style="width:38%;"></div></div></div><div class="skel-line" style="width:85%;"></div><div class="skel-line" style="width:60%;"></div></div>
+    </div>
+
+    <!-- Provider cards -->
+    <div id="providers-grid" class="providers-grid" style="display:none;"></div>
+
+  </main>
+
+  <!-- ── Reject modal ───────────────────────────────────── -->
+  <div id="reject-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="reject-modal-title">
+    <div class="modal-box">
+      <div>
+        <h2 class="modal-title" id="reject-modal-title">Reject Provider</h2>
+        <p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);margin-top:var(--spacing-2);">
+          Optionally provide a reason. This will be stored with the provider's record.
+        </p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reject-reason">Reason <span style="color:var(--color-text-muted);font-weight:400;">(optional)</span></label>
+        <textarea id="reject-reason" class="form-input" rows="3"
+          placeholder="e.g. Incomplete documents, unverifiable credentials…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeRejectModal()">Cancel</button>
+        <button class="btn btn-danger" id="reject-confirm-btn" onclick="confirmReject()">❌ Confirm Reject</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Suspend modal ──────────────────────────────────── -->
+  <div id="suspend-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="suspend-modal-title">
+    <div class="modal-box">
+      <div>
+        <h2 class="modal-title" id="suspend-modal-title">Suspend Provider</h2>
+        <p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);margin-top:var(--spacing-2);">
+          This will remove the provider from public listings. You can re-approve them later.
+        </p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="suspend-reason">Reason <span style="color:var(--color-text-muted);font-weight:400;">(optional)</span></label>
+        <textarea id="suspend-reason" class="form-input" rows="3"
+          placeholder="e.g. Policy violation, customer complaints…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeSuspendModal()">Cancel</button>
+        <button class="btn btn-warning" id="suspend-confirm-btn" onclick="confirmSuspend()">⏸ Confirm Suspend</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Portfolio lightbox ─────────────────────────────── -->
+  <div id="lightbox" role="dialog" aria-modal="true" onclick="closeLightbox(event)">
+    <button id="lightbox-close" onclick="closeLightbox()" aria-label="Close lightbox">✕</button>
+    <img id="lightbox-img" src="" alt="Portfolio image" />
+  </div>
+
+  <!-- ── Scripts ────────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/pages/admin-providers.js"></script>
+</body>
+</html>
