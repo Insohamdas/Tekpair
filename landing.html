@@ -35,6 +35,7 @@
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     
     <style>
         body { font-family: 'Manrope', sans-serif; background-color: #fafafa; }
@@ -67,9 +68,57 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.05);
         }
+        /* Luxury Loader Effects */
+        #global-loader {
+            transition: opacity 0.8s cubic-bezier(0.85, 0, 0.15, 1), transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+        @keyframes loaderReveal {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes loaderProgress {
+            0% { transform: scaleX(0); }
+            50% { transform: scaleX(0.4); }
+            100% { transform: scaleX(1); }
+        }
+        @keyframes fadeInLoader {
+            to { opacity: 1; }
+        }
+        
+        /* Prevent scroll while loading */
+        body.loading-mode {
+            overflow: hidden;
+            height: 100vh;
+        }
     </style>
 </head>
-<body class="text-slate-900 antialiased">
+<body class="text-slate-900 antialiased loading-mode">
+
+    <!-- Premium Global Loader -->
+    <div id="global-loader" class="fixed inset-0 z-[10000] bg-white flex flex-col items-center justify-center pointer-events-none">
+        <div class="overflow-hidden mb-6 flex flex-col items-center">
+            <img src="assets/tekpair.svg" alt="Tekpair" class="h-16 w-auto opacity-0" style="animation: loaderReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
+        </div>
+        <div class="w-48 h-[2px] bg-slate-100/50 overflow-hidden relative rounded-full opacity-0" style="animation: fadeInLoader 0.4s 0.6s ease forwards;">
+            <div class="absolute top-0 left-0 h-full w-full bg-[#0050CD] origin-left" style="animation: loaderProgress 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;"></div>
+        </div>
+    </div>
+
+    <!-- Script to remove loader smoothly -->
+    <script>
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('global-loader');
+            // Give a slight delay to fully appreciate the animation
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.transform = 'translateY(-20px)'; // Smooth float up
+                document.body.classList.remove('loading-mode');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 800); // Wait for transition
+            }, 1600); 
+        });
+    </script>
 
 
     <!-- Navigation -->
@@ -83,9 +132,10 @@
 
             <!-- Center Navigation -->
             <div class="hidden md:flex items-center space-x-8 text-[15px] font-medium text-slate-500">
-                <a href="browse.html" class="hover:text-slate-900 transition-colors">Services</a>
-                <a href="#" class="hover:text-slate-900 transition-colors">About Us</a>
-                <a href="#" class="hover:text-slate-900 transition-colors">Contact</a>
+                <a href="#homeservices" class="hover:text-slate-900 transition-colors">Services</a>
+                <a href="#solutions" class="hover:text-slate-900 transition-colors">Solutions</a>
+                <a href="#how-it-works" class="hover:text-slate-900 transition-colors">How It Works</a>
+                <a href="#reviews" class="hover:text-slate-900 transition-colors">Customer Stories</a>
             </div>
 
             <!-- Right Actions -->
@@ -261,7 +311,7 @@
     </section>
 
     <!-- Services Categories -->
-    <section class="py-24 px-6 bg-white">
+    <section id="homeservices" class="py-24 px-6 bg-white">
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 
@@ -429,127 +479,1619 @@
         </div>
     </section>
 
-    <!-- Why Choose Us (Dark Section) -->
-    <section class="py-24 bg-luxury-black text-white px-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div>
-                <h2 class="text-3xl md:text-5xl font-serif mb-8 leading-tight">The Tekpair Standard <br> of Excellence.</h2>
-                <div class="space-y-8">
-                    <div class="flex gap-4">
-                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-luxury-gold text-xl">🛡️</div>
-                        <div>
-                            <h4 class="text-xl font-bold mb-2">Verified Technical Experts</h4>
-                            <p class="text-gray-400 leading-relaxed">Every technician undergoes rigorous skill assessment and background verification. Only the top 5% make the cut.</p>
+    <!-- Explore Our Services Section -->
+    <section id="solutions" class="py-20 px-6 bg-gradient-to-b from-white to-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-bold text-[#111] mb-3 tracking-tight">Explore our services</h2>
+                <p class="text-gray-500 max-w-2xl mx-auto text-base">Discover essential services curated to simplify your life and elevate your experiences.</p>
+            </div>
+            
+            <!-- Category Toggle Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-16" id="categoryFilters">
+                <button class="category-btn px-7 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 tracking-wide uppercase" data-category="cleaning">
+                    Cleaning
+                </button>
+                <button class="category-btn px-7 py-3 bg-white text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-all duration-300 border-2 border-gray-300 hover:border-blue-400 shadow-md hover:shadow-lg tracking-wide uppercase" data-category="home-repair">
+                    Home Repair
+                </button>
+                <button class="category-btn px-7 py-3 bg-white text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-all duration-300 border-2 border-gray-300 hover:border-blue-400 shadow-md hover:shadow-lg tracking-wide uppercase" data-category="home-improve">
+                    Home Improve
+                </button>
+                <button class="category-btn px-7 py-3 bg-white text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-all duration-300 border-2 border-gray-300 hover:border-blue-400 shadow-md hover:shadow-lg tracking-wide uppercase" data-category="wellness">
+                    Wellness
+                </button>
+                <button class="category-btn px-7 py-3 bg-white text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-all duration-300 border-2 border-gray-300 hover:border-blue-400 shadow-md hover:shadow-lg tracking-wide uppercase" data-category="auto-moving">
+                    Auto & Moving
+                </button>
+            </div>
+
+            <!-- Service Cards Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="serviceCards">
+                <!-- Card 1: House Cleaning -->
+                <div class="service-card" data-category="cleaning">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="assets/pic14.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="House Cleaning">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                        <div class="absolute top-3 left-3 flex items-center gap-2">
+                            <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Cleaning</span>
+                            <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Verified
+                            </span>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-luxury-gold text-xl">⏱️</div>
-                        <div>
-                            <h4 class="text-xl font-bold mb-2">Punctual & Professional</h4>
-                            <p class="text-gray-400 leading-relaxed">We respect your time. Our pros arrive on schedule, equipped with the right tools to get the job done efficiently.</p>
+                    <div class="p-5">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-[#111] mb-1">House Cleaning</h3>
+                                <div class="flex items-center gap-1.5 text-sm">
+                                    <div class="flex items-center">
+                                        <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                        </svg>
+                                        <span class="ml-1 font-semibold text-gray-700">4.9</span>
+                                    </div>
+                                    <span class="text-gray-400">(245)</span>
+                                </div>
+                            </div>
+                            <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                <span class="text-xs text-blue-600 font-medium block">From</span>
+                                <div class="text-xl font-bold text-blue-600">₹149</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-gray-500 text-xs mb-3">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Kolkata, India</span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Premier cleaning services with professional staff delivering pristine results.</p>
+                        
+                        <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Same-day
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Eco-friendly
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Insured
+                            </span>
+                        </div>
+                        
+                        <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                            Book now
+                            <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Electric Panel Repairing -->
+                <div class="service-card" data-category="home-repair">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="assets/pic15.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Electric Panel Repairing">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                        <div class="absolute top-3 left-3 flex items-center gap-2">
+                            <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Home Repair</span>
+                            <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Verified
+                            </span>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-luxury-gold text-xl">💎</div>
-                        <div>
-                            <h4 class="text-xl font-bold mb-2">Satisfaction Guaranteed</h4>
-                            <p class="text-gray-400 leading-relaxed">If you're not satisfied with the service quality, we'll make it right. That's the Tekpair promise.</p>
+                    <div class="p-5">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-[#111] mb-1">Electric Panel Repairing</h3>
+                                <div class="flex items-center gap-1.5 text-sm">
+                                    <div class="flex items-center">
+                                        <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                        </svg>
+                                        <span class="ml-1 font-semibold text-gray-700">4.8</span>
+                                    </div>
+                                    <span class="text-gray-400">(182)</span>
+                                </div>
+                            </div>
+                            <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                <span class="text-xs text-blue-600 font-medium block">From</span>
+                                <div class="text-xl font-bold text-blue-600">₹299</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-gray-500 text-xs mb-3">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Delhi, India</span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Expert electrical services where reliability meets safety. Certified electricians for all your needs.</p>
+                        
+                        <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Quick service
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Certified
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Warranty
+                            </span>
+                        </div>
+                        
+                        <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                            Book now
+                            <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Card 2.5: AC Repair & Service (Home Repair Category) -->
+                <div class="service-card" data-category="home-repair">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic18.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="AC Repair">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Home Repair</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">AC Repair & Service</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.9</span>
+                                        </div>
+                                        <span class="text-gray-400">(324)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹399</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Lucknow, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Expert AC repair, maintenance and servicing for all brands and models with warranty.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Quick service
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Expert
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Warranty
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="relative">
-                <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=2070&auto=format&fit=crop" class="rounded-2xl opacity-80" alt="Tools">
-                <div class="absolute -bottom-8 -left-8 bg-white text-black p-8 rounded-tr-3xl max-w-xs shadow-2xl hidden md:block">
-                    <p class="font-serif text-2xl mb-2">"Flawless service."</p>
-                    <div class="flex items-center gap-2">
-                         <div class="text-yellow-500">★★★★★</div>
-                         <span class="text-xs font-bold uppercase text-gray-400 ml-2">Verified Review</span>
+
+                <!-- Card 3: Sofa Cleaning (Cleaning Category) -->
+                <div class="service-card" data-category="cleaning">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic13.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Sofa Cleaning">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Cleaning</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">Sofa & Carpet Cleaning</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.7</span>
+                                        </div>
+                                        <span class="text-gray-400">(189)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹199</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Bangalore, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Professional sofa and carpet cleaning with deep stain removal and deodorizing treatment.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Deep clean
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Safe products
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Fast dry
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Renovation (Home Improve Category) -->
+                <div class="service-card" data-category="home-improve">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic16.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Renovation">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Home Improve</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">Renovation</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.7</span>
+                                        </div>
+                                        <span class="text-gray-400">(224)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹699</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Mumbai, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Complete home renovation services including painting, flooring, and interior upgrades.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Professional
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Quality work
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    On-time
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Fabrication (Home Improve Category) -->
+                <div class="service-card" data-category="home-improve">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic17.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Fabrication">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Home Improve</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">Fabrication</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.6</span>
+                                        </div>
+                                        <span class="text-gray-400">(187)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹549</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Indore, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Custom fabrication services for furniture, metal work, and home improvement projects.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Custom design
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Durable
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Affordable
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6: Yoga & Fitness (Wellness Category) -->
+                <div class="service-card" data-category="wellness">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic19.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Yoga & Fitness">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Wellness</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">Yoga & Fitness</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.9</span>
+                                        </div>
+                                        <span class="text-gray-400">(312)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹399</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Hyderabad, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Certified yoga instructors and fitness trainers for home sessions and wellness coaching.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Certified
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Flexible
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Personal
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 7: Massage Therapy (Wellness Category) -->
+                <div class="service-card" data-category="wellness">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic21.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Massage Therapy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Wellness</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">Massage Therapy</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.8</span>
+                                        </div>
+                                        <span class="text-gray-400">(278)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹599</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Ahmedabad, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Professional massage therapy for relaxation, stress relief and muscle recovery.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Professional
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Relaxing
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    At-home
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Vehicle Repair (Auto & Moving Category) -->
+                <div class="service-card" data-category="auto-moving">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic12.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Vehicle Repair">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Auto & Moving</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">Vehicle Repair</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.6</span>
+                                        </div>
+                                        <span class="text-gray-400">(318)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹449</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Gurgaon, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Professional vehicle repair and maintenance services for cars, bikes, and scooters at your doorstep.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Doorstep service
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Certified
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Warranty
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Movers & Storage (Auto & Moving Category) -->
+                <div class="service-card" data-category="auto-moving">
+                    <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="assets/pic20.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Movers and Storage">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Auto & Moving</span>
+                                <span class="bg-white/95 backdrop-blur-sm text-green-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-[#111] mb-1">Movers & Storage</h3>
+                                    <div class="flex items-center gap-1.5 text-sm">
+                                        <div class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                            </svg>
+                                            <span class="ml-1 font-semibold text-gray-700">4.5</span>
+                                        </div>
+                                        <span class="text-gray-400">(276)</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                    <span class="text-xs text-blue-600 font-medium block">From</span>
+                                    <div class="text-xl font-bold text-blue-600">₹799</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-xs mb-3">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Noida, India</span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2 h-10">Reliable moving and storage solutions for homes and offices with safe packing and transport.</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Safe packing
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Insured
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Storage
+                                </span>
+                            </div>
+                            <a href="login.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                                Book now
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Detailed Stats -->
-    <section class="py-20 border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-gray-100">
-                <div class="text-center px-4">
-                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">15k+</div>
-                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Repairs Completed</div>
-                </div>
-                <div class="text-center px-4">
-                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">98%</div>
-                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Success Rate</div>
-                </div>
-                <div class="text-center px-4">
-                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">4.9</div>
-                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Average Rating</div>
-                </div>
-                <div class="text-center px-4">
-                    <div class="text-4xl md:text-5xl font-serif text-luxury-black mb-2">24h</div>
-                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400">Turnaround Time</div>
+    <!-- Working Process Section -->
+    <section class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <style>
+                *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+                .cards-scene {
+                    position: relative;
+                    width: 100%;
+                    height: 380px;
+                }
+
+                .rope-svg {
+                    position: absolute;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
+                    pointer-events: none;
+                    z-index: 0;
+                    overflow: visible;
+                }
+
+                .cards-row {
+                    position: absolute;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 44px;
+                }
+
+                .card {
+                    border-radius: 26px;
+                    padding: 32px 28px 30px;
+                    width: 260px;
+                    flex-shrink: 0;
+                    text-align: left;
+                    position: relative;
+                    z-index: 1;
+                    transition: box-shadow 0.3s ease;
+                }
+
+                .card-blue   { background: #7ED8E8; transform: rotate(-5deg) translateY(24px); }
+                .card-yellow { background: #F5D262; transform: translateY(-22px); }
+                .card-purple { background: #A9B8E8; transform: rotate(4deg) translateY(24px); }
+
+                .card:hover { box-shadow: 0 18px 44px rgba(0,0,0,0.13); }
+
+                .card-icon { width: 52px; height: 52px; margin-bottom: 18px; }
+                .card-icon svg { width: 100%; height: 100%; }
+
+                .card h3 {
+                    font-family: 'Playfair Display', serif;
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    color: #111;
+                    margin-bottom: 10px;
+                }
+
+                .card p { font-size: 0.9rem; color: #333; line-height: 1.65; }
+
+                @media (max-width: 820px) {
+                    .cards-scene { height: auto; }
+                    .rope-svg { display: none; }
+                    .cards-row { position: static; flex-direction: column; align-items: center; gap: 20px; padding: 10px 0; }
+                    .card { transform: none !important; width: 100%; max-width: 300px; }
+                }
+            </style>
+
+            <!-- Header -->
+            <div class="text-center mb-20" id="how-it-works">
+                <h2 class="text-4xl md:text-5xl font-bold text-[#111] mb-6 tracking-tight">We will make any place neat &amp; clean</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto text-base leading-relaxed">Explore our website to discover the wide range of services we offer. From cleaning and plumbing to electrical and landscaping, we've got you covered. Once you've found the service you need, simply select it and proceed to our easy-to-use booking interface.</p>
+            </div>
+
+                <div class="cards-scene">
+                    <svg class="rope-svg" viewBox="0 0 1160 380" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowR" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                                <path d="M1,1 L7,4 L1,7" stroke="#999" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </marker>
+                            <marker id="arrowL" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse">
+                                <path d="M1,1 L7,4 L1,7" stroke="#999" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </marker>
+                        </defs>
+                        <path
+                            d="M 20,305
+                               C 60,305  110,270  146,255
+                               C 200,235  260,310  406,290
+                               C 460,275  490,130  580,118
+                               C 660,108  680,270  754,258
+                               C 820,248  870,160  1014,175
+                               C 1060,180  1100,160  1140,148"
+                            stroke="#bbb"
+                            stroke-width="2"
+                            stroke-dasharray="9 6"
+                            stroke-linecap="round"
+                            fill="none"
+                            marker-end="url(#arrowR)"
+                            marker-start="url(#arrowL)"
+                        />
+                    </svg>
+
+                    <div class="cards-row">
+                        <!-- Card 1: Book online -->
+                        <div class="card card-blue">
+                            <div class="card-icon">
+                                <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="3" width="26" height="38" rx="4" stroke="#111" stroke-width="2.2"/>
+                                    <rect x="12" y="7" width="18" height="24" rx="2" stroke="#111" stroke-width="1.8"/>
+                                    <circle cx="21" cy="36" r="1.8" fill="#111"/>
+                                    <line x1="30" y1="26" x2="40" y2="18" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+                                    <circle cx="41" cy="17" r="3" stroke="#111" stroke-width="1.8"/>
+                                </svg>
+                            </div>
+                            <h3>Book online</h3>
+                            <p>Customize your service by selecting your preferred date, time, and any additional...</p>
+                        </div>
+
+                        <!-- Card 2: Get Confirmation -->
+                        <div class="card card-yellow">
+                            <div class="card-icon">
+                                <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="26" cy="26" r="21" stroke="#111" stroke-width="2.2"/>
+                                    <path d="M16 26 L23 33 L37 18" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <h3>Get Confirmation</h3>
+                            <p>After submitting your booking request, you'll receive an instant confirmation via email or SMS....</p>
+                        </div>
+
+                        <!-- Card 3: Enjoy -->
+                        <div class="card card-purple">
+                            <div class="card-icon">
+                                <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="26" cy="11" r="5" stroke="#111" stroke-width="2.2"/>
+                                    <path d="M18 21 Q26 17 34 21 L36 36 H16 Z" stroke="#111" stroke-width="2.2" stroke-linejoin="round" fill="none"/>
+                                    <line x1="19" y1="36" x2="15" y2="47" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+                                    <line x1="33" y1="36" x2="37" y2="47" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+                                    <line x1="19" y1="25" x2="9" y2="16" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+                                    <line x1="33" y1="25" x2="43" y2="16" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+                                    <path d="M7 12 L8 9 L9 12 L8 15 Z" fill="#111"/>
+                                    <path d="M43 12 L44 9 L45 12 L44 15 Z" fill="#111"/>
+                                    <circle cx="6" cy="17" r="1.5" fill="#111"/>
+                                    <circle cx="46" cy="17" r="1.5" fill="#111"/>
+                                </svg>
+                            </div>
+                            <h3>Enjoy</h3>
+                            <p>Sit back, relax, and enjoy the results of our services. Whether it's a sparkling clean home...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="py-24 px-6 bg-white">
+        <style>
+            .testimonial-section {
+                width: 100%;
+                max-width: 1100px;
+                position: relative;
+                margin: 0 auto;
+            }
+
+            .testimonial-heading {
+                font-size: 52px;
+                font-weight: 800;
+                color: #111111;
+                margin-bottom: 44px;
+                line-height: 1.1;
+                letter-spacing: -1.5px;
+            }
+
+            .testimonial-layout {
+                display: flex;
+                align-items: flex-start;
+                gap: 0;
+                position: relative;
+            }
+
+            .testimonial-left {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                flex-shrink: 0;
+                width: 260px;
+            }
+
+            .nav-row {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .btn-nav {
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                font-weight: 600;
+            }
+            .btn-nav:hover { transform: scale(1.08); }
+
+            .btn-prev-tst { 
+                background: #f0f8ff;
+                box-shadow: 0 4px 16px rgba(0, 80, 205, 0.08);
+            }
+            
+            .btn-prev-tst:hover {
+                background: #e8f4ff;
+                box-shadow: 0 8px 24px rgba(0, 80, 205, 0.12);
+            }
+
+            .btn-next-tst { 
+                background: linear-gradient(135deg, #0050CD 0%, #0074E4 100%);
+                box-shadow: 0 4px 16px rgba(0, 80, 205, 0.2);
+            }
+            
+            .btn-next-tst:hover {
+                box-shadow: 0 8px 24px rgba(0, 80, 205, 0.25);
+            }
+
+            .speaker-card {
+                background: #ffffff;
+                border-radius: 24px;
+                padding: 16px 16px 24px;
+                text-align: center;
+                width: 260px;
+                box-shadow: 0 8px 32px rgba(0, 80, 205, 0.08);
+                transition: all 0.4s ease;
+            }
+
+            .speaker-card:hover {
+                background: #ffffff;
+                box-shadow: 0 16px 48px rgba(0, 80, 205, 0.12);
+                transform: translateY(-4px);
+            }
+
+            .photo-wrap {
+                width: 100%;
+                height: 265px;
+                border-radius: 16px;
+                overflow: hidden;
+                background: #f8f8f8;
+            }
+
+            .photo-wrap img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: top center;
+                transition: transform 0.4s ease;
+            }
+
+            .speaker-card:hover .photo-wrap img {
+                transform: scale(1.05);
+            }
+
+            .speaker-card h3 {
+                font-size: 16px;
+                font-weight: 700;
+                background: linear-gradient(135deg, #0050CD 0%, #0074E4 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-top: 16px;
+                margin-bottom: 5px;
+            }
+
+            .speaker-card p {
+                font-size: 13px;
+                color: #0074E4;
+                font-weight: 500;
+            }
+
+            .testimonial-right {
+                flex: 1;
+                padding-left: 44px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .quote-wrap {
+                margin-bottom: 70px;
+            }
+
+            .quote-box {
+                background: #ffffff;
+                border-radius: 24px;
+                padding: 32px 36px;
+                max-width: 500px;
+                position: relative;
+                box-shadow: 0 8px 32px rgba(0, 80, 205, 0.08);
+                transition: all 0.4s ease;
+            }
+
+            .quote-box:hover {
+                background: #ffffff;
+                box-shadow: 0 16px 48px rgba(0, 80, 205, 0.12);
+                transform: translateY(-4px);
+            }
+
+            .quote-box::after {
+                content: '';
+                position: absolute;
+                bottom: -20px;
+                left: 36px;
+                width: 0; height: 0;
+                border-left: 0px solid transparent;
+                border-right: 24px solid transparent;
+                border-top: 20px solid #ffffff;
+            }
+
+            .quote-box p {
+                font-size: 15px;
+                line-height: 1.8;
+                color: #0A0E27;
+                font-weight: 500;
+            }
+
+            .quote-box p strong {
+                color: #0050CD;
+                font-weight: 700;
+                font-style: italic;
+            }
+
+            .thumbs-section {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .counter {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border: none;
+                border-radius: 100px;
+                padding: 8px 24px;
+                font-size: 14px;
+                font-weight: 700;
+                background: #f0f8ff;
+                color: #0050CD;
+                width: fit-content;
+                box-shadow: 0 4px 16px rgba(0, 80, 205, 0.08);
+            }
+
+            .thumbs-row {
+                display: flex;
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+
+            .thumb {
+                width: 95px;
+                height: 118px;
+                border-radius: 16px;
+                overflow: hidden;
+                cursor: pointer;
+                border: none;
+                transition: all 0.3s ease;
+                background: #ffffff;
+                flex-shrink: 0;
+                position: relative;
+                box-shadow: 0 4px 16px rgba(0, 80, 205, 0.08);
+            }
+
+            .thumb:hover { 
+                transform: translateY(-4px);
+                box-shadow: 0 12px 32px rgba(0, 80, 205, 0.12);
+            }
+            
+            .thumb.active { 
+                box-shadow: 0 12px 32px rgba(0, 80, 205, 0.15);
+            }
+
+            .thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: top center;
+                filter: grayscale(100%);
+                transition: filter 0.4s ease;
+            }
+
+            .thumb:hover img,
+            .thumb.active img { 
+                filter: grayscale(0%);
+            }
+
+            @keyframes fadeUp {
+                from { opacity: 0; transform: translateY(12px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .fade { animation: fadeUp 0.4s ease; }
+
+            @media (max-width: 860px) {
+                .testimonial-heading { font-size: 36px; }
+                .testimonial-layout { flex-direction: column; gap: 32px; }
+                .testimonial-left { width: 100%; flex-direction: row; align-items: flex-start; gap: 20px; }
+                .speaker-card { width: 180px; }
+                .photo-wrap { height: 180px; }
+                .testimonial-right { padding-left: 0; }
+                .quote-box { max-width: 100%; }
+            }
+
+            @media (max-width: 540px) {
+                .testimonial-heading { font-size: 28px; margin-bottom: 28px; }
+                .testimonial-left { flex-direction: column; }
+                .speaker-card { width: 100%; }
+                .photo-wrap { height: 230px; }
+                .thumb { width: 72px; height: 90px; }
+                .testimonial-right { padding-left: 0; }
+                .quote-box { padding: 24px 28px; }
+            }
+        </style>
+
+        <div id="reviews" class="testimonial-section">
+            <h1 class="testimonial-heading">What they say about us</h1>
+
+            <div class="testimonial-layout">
+                <!-- LEFT -->
+                <div class="testimonial-left">
+                    <div class="nav-row">
+                        <button class="btn-nav btn-prev-tst" onclick="goTestimonial(-1)" aria-label="Previous">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#8880d0" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <button class="btn-nav btn-next-tst" onclick="goTestimonial(1)" aria-label="Next">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="speaker-card" id="speakerCard">
+                        <div class="photo-wrap">
+                            <img id="activePhoto" src="" alt=""/>
+                        </div>
+                        <h3 id="activeName"></h3>
+                        <p id="activeRole"></p>
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="testimonial-right">
+                    <div class="quote-wrap">
+                        <div class="quote-box" id="quoteBox">
+                            <p id="quoteText"></p>
+                        </div>
+                    </div>
+
+                    <div class="thumbs-section">
+                        <div class="counter" id="counter"></div>
+                        <div class="thumbs-row" id="thumbsRow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const testimonialPeople = [
+                {
+                    name: "Hitesh Choudhary",
+                    role: "Working professional, Jaipur, India",
+                    photo: "assets/pic28.jpeg",
+                    quote: `"Tekpair's cleaning and maintenance services have transformed my home into a spotless sanctuary. Their team is <strong>professional, punctual, and reliable</strong>. Highly recommended!"`
+                },
+                {
+                    name: "Piyush Garg",
+                    role: "Chandigarh, India",
+                    photo: "assets/pic26.png",
+                    quote: `"I needed urgent AC repair and Tekpair responded within hours. The technician was <strong>skilled and transparent</strong> about pricing. Best service experience I've had!"`
+                },
+                {
+                    name: "Rohan Kumar",
+                    role: "Entrepreneur, Delhi, India",
+                    photo: "assets/pic22.jpg",
+                    quote: `"My entire home's electrical wiring needed update. Tekpair completed it <strong>safely and efficiently</strong> with no hidden charges. They are the most trustworthy!"`
+                },
+                {
+                    name: "Neha Varma",
+                    role: "House Wife, Kolkata, India",
+                    photo: "assets/pic23.avif",
+                    quote: `"Tekpair's home cleaning service is absolutely fantastic! My carpets and sofas look brand new. The staff is <strong>courteous and detail-oriented</strong>. Worth every penny!"`
+                },
+                {
+                    name: "Puspita Singh",
+                    role: "Bengaluru, India",
+                    photo: "assets/pic24.jpg",
+                    quote: `"My kitchen plumbing issue was fixed within an hour by Tekpair. The technician was <strong>knowledgeable and friendly</strong>. Excellent service at affordable rates!"`
+                },
+                {
+                    name: "Rohit Das",
+                    role: "Student, Kolkata, India",
+                    photo: "assets/pic25.avif",
+                    quote: `"As a student, affordability matters. Tekpair's services are <strong>pocket-friendly and high-quality</strong>. They fixed my laptop and did home repairs perfectly!"`
+                },
+                {
+                    name: "Monisha Khan",
+                    role: "House Wife, Mumbai, India",
+                    photo: "assets/pic27.jpg",
+                    quote: `"Tekpair's pest control and deep cleaning service saved my family from health hazards. Their staff is <strong>certified and uses eco-friendly products</strong>. Truly amazing!"`
+                }
+            ];
+
+            let currentTestimonial = 0;
+
+            function renderTestimonial(animate) {
+                const p = testimonialPeople[currentTestimonial];
+
+                if (animate) {
+                    ['speakerCard','quoteBox'].forEach(id => {
+                        const el = document.getElementById(id);
+                        el.classList.remove('fade');
+                        void el.offsetWidth;
+                        el.classList.add('fade');
+                    });
+                }
+
+                document.getElementById('activePhoto').src         = p.photo;
+                document.getElementById('activePhoto').alt         = p.name;
+                document.getElementById('activeName').textContent  = p.name;
+                document.getElementById('activeRole').textContent  = p.role;
+                document.getElementById('quoteText').innerHTML     = p.quote;
+                document.getElementById('counter').textContent     = `${currentTestimonial + 1} / ${testimonialPeople.length}`;
+
+                const row = document.getElementById('thumbsRow');
+                row.innerHTML = '';
+                testimonialPeople.forEach((t, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'thumb' + (i === currentTestimonial ? ' active' : '');
+                    div.onclick = () => goToTestimonial(i);
+                    const img = document.createElement('img');
+                    img.src = t.photo;
+                    img.alt = t.name;
+                    div.appendChild(img);
+                    row.appendChild(div);
+                });
+            }
+
+            function goTestimonial(dir) {
+                currentTestimonial = (currentTestimonial + dir + testimonialPeople.length) % testimonialPeople.length;
+                renderTestimonial(true);
+            }
+
+            function goToTestimonial(i) {
+                currentTestimonial = i;
+                renderTestimonial(true);
+            }
+
+            renderTestimonial(false);
+        </script>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-white pt-24 pb-12 border-t border-gray-100">
-        <!-- Logo & Social -->
-        <div class="max-w-7xl mx-auto px-6 mb-16 grid grid-cols-1 md:grid-cols-12 gap-12">
-            <div class="md:col-span-4">
-                <a href="/" class="block mb-6">
-                    <img src="assets/tekpair_logo.png" alt="Tekpair" class="h-10 w-auto">
-                </a>
-                <p class="text-gray-500 leading-relaxed mb-8 max-w-sm">
-                    Elevating home technical services. We connect discerning homeowners with the industry's most skilled professionals.
-                </p>
-                <!-- Social Icons -->
-                 <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition">X</a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition">in</a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition">Ig</a>
+    <footer class="syn-footer-root">
+        <style>
+            .syn-footer-root,
+            .syn-footer-root *,
+            .syn-footer-root *::before,
+            .syn-footer-root *::after { box-sizing: border-box; }
+
+            .syn-footer-root {
+                --blue: #1A4BFF;
+                --blue-dark: #1239CC;
+                --white: #ffffff;
+                --cream: #E8EEFF;
+                --text-dark: #0f172a;
+                --text-mid: #1e3a8a;
+                background: linear-gradient(to bottom, #ffffff 0%, #f8faff 10%, #edf3ff 22%, #dbe7ff 38%, #b7ceff 56%, #7da5ff 74%, #1A4BFF 92%, #1A4BFF 100%);
+                color: var(--text-dark);
+                font-family: 'Manrope', sans-serif;
+                margin-top: 0;
+            }
+
+            .syn-footer-main {
+                padding: 80px 60px 60px;
+                display: grid;
+                grid-template-columns: 320px 1fr;
+                gap: 80px;
+                align-items: flex-start;
+            }
+
+            .syn-logo {
+                font-family: 'Playfair Display', serif;
+                font-size: 28px;
+                letter-spacing: -0.2px;
+                font-weight: 700;
+                margin-bottom: 20px;
+                position: relative;
+                display: inline-block;
+            }
+
+            .syn-logo-img {
+                height: 120px;
+                width: auto;
+                display: block;
+                margin-bottom: 20px;
+            }
+
+            .syn-logo::after {
+                content: '';
+                display: block;
+                width: 8px;
+                height: 8px;
+                background: var(--text-mid);
+                border-radius: 50%;
+                position: absolute;
+                bottom: 2px;
+                right: -10px;
+            }
+
+            .syn-tagline {
+                font-size: 16px;
+                line-height: 1.7;
+                color: #334155;
+                max-width: 290px;
+                margin-bottom: 30px;
+                letter-spacing: 0;
+            }
+
+            .syn-subscribe-label {
+                font-size: 12px;
+                letter-spacing: 0.02em;
+                text-transform: none;
+                font-weight: 700;
+                margin-bottom: 12px;
+                color: var(--text-mid);
+            }
+
+            .syn-email-row {
+                display: flex;
+                align-items: center;
+                gap: 0;
+                margin-bottom: 0;
+            }
+
+            .syn-email-input {
+                background: rgba(255,255,255,0.72);
+                border: 1px solid rgba(30,58,138,0.25);
+                border-right: none;
+                color: var(--text-dark);
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                padding: 10px 16px;
+                outline: none;
+                width: 220px;
+                letter-spacing: 0;
+            }
+
+            .syn-email-input::placeholder { color: #64748b; }
+
+            .syn-email-input:focus {
+                background: rgba(255,255,255,0.92);
+                border-color: rgba(30,58,138,0.45);
+            }
+
+            .syn-email-btn {
+                background: var(--white);
+                border: 1px solid var(--white);
+                color: var(--blue);
+                padding: 10px 14px;
+                cursor: pointer;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.2s, color 0.2s;
+            }
+
+            .syn-email-btn:hover { background: var(--cream); }
+
+            .syn-footer-nav {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 40px 20px;
+                padding-top: 8px;
+            }
+
+            .syn-nav-link {
+                display: block;
+                font-size: 13px;
+                letter-spacing: 0.01em;
+                text-transform: none;
+                font-weight: 600;
+                color: var(--text-dark);
+                text-decoration: none;
+                margin-bottom: 14px;
+                opacity: 0.92;
+                transition: opacity 0.2s;
+                line-height: 1.45;
+            }
+
+            .syn-nav-link:hover { opacity: 1; text-decoration: underline; }
+
+            .syn-footer-bottom {
+                border-top: 1px solid rgba(255,255,255,0.2);
+                padding: 22px 60px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 14px;
+                letter-spacing: 0.01em;
+                font-weight: 600;
+                opacity: 1;
+                color: var(--white);
+            }
+
+            .syn-footer-bottom a { color: var(--white); text-decoration: none; }
+            .syn-footer-bottom a:hover { text-decoration: underline; }
+
+            .syn-footer-bottom-left {
+                display: flex;
+                gap: 24px;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .syn-footer-bottom-left span { opacity: 0.4; }
+
+            .syn-social-icons { display: flex; gap: 12px; align-items: center; }
+
+            .syn-social-icon {
+                width: 30px;
+                height: 30px;
+                border: 1px solid rgba(255,255,255,0.4);
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: border-color 0.2s, background 0.2s;
+            }
+
+            .syn-social-icon:hover {
+                border-color: var(--white);
+                background: rgba(255,255,255,0.1);
+            }
+
+            .syn-social-icon svg { width: 14px; height: 14px; fill: var(--white); }
+
+            .syn-wordmark-row { display: flex; align-items: flex-end; overflow: hidden; }
+
+            .syn-wordmark {
+                font-family: 'Playfair Display', serif;
+                font-size: clamp(80px, 14vw, 200px);
+                color: rgba(255,255,255,0.22);
+                letter-spacing: -0.03em;
+                user-select: none;
+                display: block;
+                padding: 0 40px;
+                line-height: 0.85;
+            }
+
+            .syn-wordmark-logo {
+                height: clamp(100px, 14vw, 180px);
+                width: auto;
+                opacity: 0.35;
+                display: block;
+                padding: 0 40px 8px;
+            }
+
+            @media (max-width: 1024px) {
+                .syn-footer-main {
+                    grid-template-columns: 1fr;
+                    gap: 40px;
+                    padding: 64px 28px 48px;
+                }
+
+                .syn-footer-nav {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                .syn-footer-bottom {
+                    padding: 20px 28px;
+                    flex-direction: column;
+                    gap: 16px;
+                    align-items: flex-start;
+                }
+
+                .syn-wordmark { padding: 0 20px; }
+            }
+
+            @media (max-width: 640px) {
+                .syn-footer-nav { grid-template-columns: 1fr; }
+                .syn-email-input { width: 100%; }
+                .syn-email-row { width: 100%; }
+            }
+        </style>
+
+        <div class="syn-footer-main">
+            <div class="syn-footer-left">
+                <img src="assets/tekpair.svg" alt="Tekpair" class="syn-logo-img"/>
+                <p class="syn-tagline">See what's in it for you. Expert home services, delivered to your doorstep.</p>
+                <img src="assets/soham.svg" alt="Soham" style="width: auto; height: 105px; margin-top: 30px;"/>
+            </div>
+
+            <nav class="syn-footer-nav">
+                <div class="syn-nav-col">
+                    <div style="font-weight: 700; font-size: 14px; margin-bottom: 16px; color: var(--text-dark);">Company</div>
+                    <a href="about-us.html" class="syn-nav-link">About us</a>
+                    <a href="terms-conditions.html" class="syn-nav-link">Terms & conditions</a>
+                    <a href="privacy-policy.html" class="syn-nav-link">Privacy policy</a>
                 </div>
+                <div class="syn-nav-col">
+                    <div style="font-weight: 700; font-size: 14px; margin-bottom: 16px; color: var(--text-dark);">For customers</div>
+                    <a href="#reviews" class="syn-nav-link">Reviews</a>
+                    <a href="#homeservices" class="syn-nav-link">Categories near you</a>
+                    <a href="#" class="syn-nav-link">Contact us</a>
+                </div>
+                <div class="syn-nav-col">
+                    <div style="font-weight: 700; font-size: 14px; margin-bottom: 16px; color: var(--text-dark);">For professionals</div>
+                    <a href="login.html?mode=provider" class="syn-nav-link">Register as a professional</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="syn-footer-bottom">
+            <div class="syn-footer-bottom-left">
+                <span style="opacity: 1; color: #ffffff;">© 2026 Tekpair. All rights reserved | UDYAM Reg. no. UDYAM-WB-07-0092210</span>
             </div>
-            
-            <!-- Links -->
-            <div class="md:col-span-2 md:col-start-7">
-                <h5 class="font-bold text-gray-900 mb-6 uppercase text-xs tracking-widest">Services</h5>
-                <ul class="space-y-4 text-sm text-gray-500 font-medium">
-                    <li><a href="#" class="hover:text-black transition">AC Repair</a></li>
-                    <li><a href="#" class="hover:text-black transition">Electrical</a></li>
-                    <li><a href="#" class="hover:text-black transition">Smart Home</a></li>
-                    <li><a href="#" class="hover:text-black transition">Plumbing</a></li>
-                </ul>
-            </div>
-            <div class="md:col-span-2">
-                <h5 class="font-bold text-gray-900 mb-6 uppercase text-xs tracking-widest">Company</h5>
-                <ul class="space-y-4 text-sm text-gray-500 font-medium">
-                    <li><a href="#" class="hover:text-black transition">About Tekpair</a></li>
-                    <li><a href="#" class="hover:text-black transition">Careers</a></li>
-                    <li><a href="/login.html?mode=provider" class="text-luxury-gold hover:text-blue-800 transition">For Pros</a></li>
-                </ul>
-            </div>
-            <div class="md:col-span-2">
-                <h5 class="font-bold text-gray-900 mb-6 uppercase text-xs tracking-widest">Support</h5>
-                <ul class="space-y-4 text-sm text-gray-500 font-medium">
-                    <li><a href="#" class="hover:text-black transition">Help Center</a></li>
-                    <li><a href="#" class="hover:text-black transition">Terms</a></li>
-                    <li><a href="#" class="hover:text-black transition">Privacy</a></li>
-                </ul>
+            <div class="syn-social-icons">
+                <a href="https://www.linkedin.com/company/tekpair/" target="_blank" rel="noopener noreferrer" class="syn-social-icon" title="LinkedIn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                <a href="https://www.instagram.com/tekpair?igsh=MWd5ZGlzdW1iamlzeQ==" target="_blank" rel="noopener noreferrer" class="syn-social-icon" title="Instagram">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                    </svg>
+                </a>
+                <a href="mailto:contact@tekpair.store" class="syn-social-icon" title="Email">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                </a>
             </div>
         </div>
-        
-        <!-- Bottom Bar -->
-        <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400 font-medium">
-            <p>&copy; 2026 Tekpair Inc. All rights reserved.</p>
-            <div class="flex gap-6 mt-4 md:mt-0">
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-                <a href="#">Sitemap</a>
-            </div>
+
+        <div class="syn-wordmark-row">
+            <div style="font-family: 'Playfair Display', serif; font-size: 390px; font-weight: 900; color: rgba(26, 75, 255, 0.15); letter-spacing: -2px; line-height: 0.85; padding: 10px 30px 8px; user-select: none;">Tekpair</div>
         </div>
     </footer>
 
@@ -572,6 +2114,41 @@
                         fallback.style.display = 'none';
                     }
                 }, 500);
+            }
+        });
+
+        // Category Filter Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const serviceCards = document.querySelectorAll('.service-card');
+
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const selectedCategory = this.dataset.category;
+
+                    // Update button styles
+                    categoryButtons.forEach(btn => {
+                        btn.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-blue-700', 'text-white', 'shadow-lg', 'hover:shadow-xl', 'hover:from-blue-700', 'hover:to-blue-800', 'transform', 'hover:-translate-y-1');
+                        btn.classList.add('bg-white', 'text-gray-700', 'border-2', 'border-gray-300', 'shadow-md', 'hover:bg-gray-50', 'hover:border-blue-400');
+                    });
+                    this.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-blue-700', 'text-white', 'shadow-lg', 'hover:shadow-xl', 'hover:from-blue-700', 'hover:to-blue-800', 'transform', 'hover:-translate-y-1');
+                    this.classList.remove('bg-white', 'text-gray-700', 'border-2', 'border-gray-300', 'shadow-md', 'hover:bg-gray-50', 'hover:border-blue-400');
+
+                    // Filter and show service cards
+                    serviceCards.forEach(card => {
+                        if (card.dataset.category === selectedCategory) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Show Cleaning category by default
+            const defaultButton = document.querySelector('[data-category="cleaning"]');
+            if (defaultButton) {
+                defaultButton.click();
             }
         });
     </script>
