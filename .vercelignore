@@ -1,0 +1,19 @@
+# Dependency and build folders
+node_modules
+coverage
+
+# Tests and local docs
+tests
+**/*.test.js
+**/*.spec.js
+
+# Local/dev files
+.env
+.env.*
+.DS_Store
+npm-debug.log*
+
+# Git and editor files
+.git
+.gitignore
+.vscode
